@@ -29,7 +29,7 @@ class Entity {
         this.position = position;
         this.dimensions = [1, 1]
         this.velocity = [0, 0];
-        this.isGrounded = true;
+        this.isGrounded = false;
         this.maxSpeed = maxSpeed;
         this.minSpeed = .001;
     
@@ -42,66 +42,92 @@ class Entity {
     /**
      * Checks for collisions between entity and loaded platforms.
      * 
-     * @param {[number, number]} potentialPosition the next position that the entity would be in based on its current velocity ignoring collisions
+     * @param {[number, number]} potentialPosition [x, y] the next position that the entity would be in based on its current velocity ignoring collisions
      * 
-     * @return {[number, number]} [x, y] direction of collisions on x and y axis, if no collision is occuring then the value will be 0
+     * @return {[number, number]} [x, y] actual next position that the entity will be in based on collisions
      */
     checkCollisions(potentialPosition){
 
-        //note to self: make parameters before and after position so you can check movement in each direction separately. Also read an article on this or somethimng.
+        let result = [...potentialPosition];
 
-        let result = [0, 0];
+        //checks if collision occurs at certain position and returns true or false
+        let positionTest = (pos, platform)=>{
+
+            //the names of these variables reference direction from the entity's perspective
+            let positiveXCollision = (pos[0] + this.dimensions[0] > platform.position[0]);
+            let negativeXCollision = (pos[0] < platform.position[0] + platform.dimensions[0]);
+            let positiveYCollision = (pos[1] + this.dimensions[1] > platform.position[1]);
+            let negativeYCollision = (pos[1] < platform.position[1] + platform.dimensions[1]);
+
+            return (positiveXCollision && negativeXCollision && positiveYCollision && negativeYCollision);
+
+        }
 
         for(let i in loadedPlatforms){
             let platform = loadedPlatforms[i];
 
+            if (positionTest(result, platform)){
+                
+                if (positionTest([this.position[0], result[1]], platform)){
 
-            //the names of these variables reference direction from the entity's perspective
-            let positiveXCollision = (this.position[0] + this.dimensions[0] >= platform.position[0]);
-            let negativeXCollision = (this.position[0] <= platform.position[0] + platform.dimensions[0]);
-            let positiveYCollision = (this.position[1] + this.dimensions[1] >= platform.position[1]);
-            let negativeYCollision = (this.position[1] <= platform.position[1] + platform.dimensions[1]);
+                    if (this.position[1] < potentialPosition[1]) {
+                        result[1] = platform.position[1] - this.dimensions[1];
+                    } else {
+                        result[1] = platform.position[1] + platform.dimensions[1];
+                    }
 
-            if(positiveXCollision && negativeXCollision && positiveYCollision && negativeYCollision){
-
-
+                }else{
+                    if(this.position[0] < potentialPosition[0]){
+                        result[0] = platform.position[0]-this.dimensions[0];
+                    }else{
+                        result[0] = platform.position[0] + platform.dimensions[0];
+                    }
+                }
 
             }
 
         }
 
         return result;
+
     }
 
     update(deltaTime){
 
+        console.log(this.isGrounded)
+
+        //gravity stuff
+
+        let groundedTestPos = [this.position[0], this.position[1] + .01];
+        let groundedCollisionTest = this.checkCollisions(groundedTestPos);
+
+        if(groundedCollisionTest[1] === groundedTestPos[1]){
+            this.isGrounded = false;
+            this.velocity[1] += this.gravity * deltaTime/1000;
+        }else{
+            this.isGrounded = true;
+        }
+
+
+        //collision and movement stuff
+
         let potentialPosition = [this.position[0] + (this.velocity[0] * deltaTime/1000), this.position[1] + (this.velocity[1]*deltaTime/1000)];
 
-        if(!this.isGrounded){
-            this.velocity[1] += this.gravity * deltaTime/1000;
+        let collisionResult = this.checkCollisions(potentialPosition);
 
-        }
-        
-        for (let i in this.position) {
-            this.position[i] = potentialPosition[i];
-        }
+        if(collisionResult[0] !== potentialPosition[0] && collisionResult[1] !== potentialPosition[1]){
 
+            //sets velocity to 0 on axis that collision occured
 
-        //TEST CODE, CHANGE WHEN TILE SYSTEM IS IMPLEMENTED
-
-        if (this.position[1] >= 10) {
-
-            this.isGrounded = true;
-            if (this.position[1] > 10) {
-                this.position[1] = 10;
+            if(potentialPosition[0] !== collisionResult[0]){
+                this.velocity[0] = 0;
+            }else{
+                this.velocity[1] = 0;
             }
 
-        } else {
-            if (this.isGrounded) {
-                this.isGrounded = false;
-                this.lastGroundTime = Date.now();
-            }
         }
+
+        this.position = collisionResult;
 
     }
 }
@@ -283,5 +309,7 @@ charController.init();
 
 const player = new Player([10, 10]);
 loadedPlatforms.push(new Platform([10, 11], [25, 1]));
+loadedPlatforms.push(new Platform([15, 6], [25, 1]));
+loadedPlatforms.push(new Platform([15, 10], [1, 1]));
 
 window.requestAnimationFrame(update);
