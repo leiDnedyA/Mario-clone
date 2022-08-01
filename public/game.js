@@ -35,7 +35,7 @@ class Entity {
     
         this.lastGroundTime = Date.now();
 
-        this.gravity = 100;
+        this.gravity = 40;
     
     }
 
@@ -94,8 +94,6 @@ class Entity {
 
     update(deltaTime){
 
-        console.log(this.isGrounded)
-
         //gravity stuff
 
         let groundedTestPos = [this.position[0], this.position[1] + .01];
@@ -115,16 +113,13 @@ class Entity {
 
         let collisionResult = this.checkCollisions(potentialPosition);
 
-        if(collisionResult[0] !== potentialPosition[0] && collisionResult[1] !== potentialPosition[1]){
 
-            //sets velocity to 0 on axis that collision occured
+        //sets velocity to 0 on axis that collision occured
 
-            if(potentialPosition[0] !== collisionResult[0]){
-                this.velocity[0] = 0;
-            }else{
-                this.velocity[1] = 0;
-            }
-
+        if (potentialPosition[0] !== collisionResult[0]) {
+            this.velocity[0] = 0;
+        } else if(potentialPosition[1] !== collisionResult[1]) {
+            this.velocity[1] = 0;
         }
 
         this.position = collisionResult;
@@ -137,7 +132,7 @@ class Player extends Entity {
         super(position, 50);
 
         this.acceleration = 150;
-        this.jumpPower = 40;
+        this.jumpPower = 30;
         this.earlyJumpTimer = 300; //millisecond buffer for if player presses jump button before hitting ground
         this.lateJumpTimer = 25; //millisecond buffer for if player presses jump button after leaving ground
 
