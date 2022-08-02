@@ -5,8 +5,9 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+const tilesVisibleVertically = 40;
 
-var tileSize = canvas.height / 25;
+var tileSize = canvas.height / tilesVisibleVertically;
 
 const entities = [];
 
@@ -14,6 +15,8 @@ var deltaTime = 0;
 var lastTime = Date.now();
 
 const loadedPlatforms = [];
+
+window.addEventListener('contextmenu',e=>{e.preventDefault()});
 
 window.addEventListener('resize', e=>{canvas.width = window.innerWidth; canvas.height = window.innerHeight; tileSize = canvas.height / 25;});
 
@@ -100,6 +103,9 @@ class Entity {
         let groundedCollisionTest = this.checkCollisions(groundedTestPos);
 
         if(groundedCollisionTest[1] === groundedTestPos[1]){
+            if(this.isGrounded){
+                this.lastGroundTime = Date.now();
+            }
             this.isGrounded = false;
             this.velocity[1] += this.gravity * deltaTime/1000;
         }else{
@@ -131,10 +137,10 @@ class Player extends Entity {
     constructor(position){
         super(position, 50);
 
-        this.acceleration = 150;
+        this.acceleration = 80;
         this.jumpPower = 30;
         this.earlyJumpTimer = 300; //millisecond buffer for if player presses jump button before hitting ground
-        this.lateJumpTimer = 25; //millisecond buffer for if player presses jump button after leaving ground
+        this.lateJumpTimer = 150; //millisecond buffer for if player presses jump button after leaving ground
 
         this.lastJumpRequest = Date.now();
         this.checkJumpRequest = false;
@@ -302,9 +308,13 @@ function update(){
 
 charController.init();
 
-const player = new Player([10, 10]);
+const player = new Player([40, 25]);
 loadedPlatforms.push(new Platform([10, 11], [25, 1]));
 loadedPlatforms.push(new Platform([15, 6], [25, 1]));
-loadedPlatforms.push(new Platform([15, 10], [1, 1]));
+loadedPlatforms.push(new Platform([20, 3], [25, 1]));
+loadedPlatforms.push(new Platform([40, 15], [4, 1]));
+loadedPlatforms.push(new Platform([15, 25], [4, 1]));
+loadedPlatforms.push(new Platform([15, 6], [25, 1]));
+loadedPlatforms.push(new Platform([30, 30], [25, 1]));
 
 window.requestAnimationFrame(update);
