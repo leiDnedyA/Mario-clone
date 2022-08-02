@@ -9,16 +9,24 @@ const tilesVisibleVertically = 40;
 
 var tileSize = canvas.height / tilesVisibleVertically;
 
-const entities = [];
+var entities = [];
+var loadedPlatforms = [];
 
 var deltaTime = 0;
 var lastTime = Date.now();
 
-const loadedPlatforms = [];
-
 window.addEventListener('contextmenu',e=>{e.preventDefault()});
 
-window.addEventListener('resize', e=>{canvas.width = window.innerWidth; canvas.height = window.innerHeight; tileSize = canvas.height / 25;});
+window.addEventListener('resize', e=>{canvas.width = window.innerWidth; canvas.height = window.innerHeight; tileSize = canvas.height / tilesVisibleVertically;});
+
+class Level {
+    constructor(entities = [], platforms = [], playerStartPos = [0, 0], boundingBox = [[0, 0], [tilesVisibleVertically * 1.5, tilesVisibleVertically]]){
+        this.entities = entities;
+        this.platforms = platforms;
+        this.playerStartPos = playerStartPos;
+        this.boundingBox = boundingBox;
+    }
+}
 
 class Platform {
     constructor(position = [0, 0], dimensions = [0, 0]){
@@ -193,6 +201,11 @@ class Player extends Entity {
         this.velocity[1] = -this.jumpPower;
     }
 
+    die() {
+        this.position = levelManager.getCurrentLevel().playerStartPos;
+        this.velocity = [0, 0]
+    }
+
     tryJump() {
         if (this.isGrounded || Date.now() - this.lastGroundTime <= this.lateJumpTimer) {
             this.jump();
@@ -215,6 +228,8 @@ class Player extends Entity {
                 this.checkJumpRequest = false;
             }
         }
+
+        if(!pointInBox(this.position, levelManager.getCurrentLevel().boundingBox)) this.die();
 
     }
 }
@@ -288,8 +303,54 @@ const renderer = {
     }
 };
 
+const levelManager = {
+
+    currentLevelIndex: null,
+
+    levels: [],
+
+    loadLevel: function(index){
+        if(this.levels.length > index){
+
+            this.currentLevelIndex = index;
+
+            let level = this.levels[index];
+            entities = [];
+            loadedPlatforms = [];
+
+            for(let i in level.platforms){
+                loadedPlatforms.push(level.platforms[i]);
+            }
+
+            for(let i in level.entities){
+                entities.push(level.entities[i]);
+            }
+
+            player.position = [...level.playerStartPos];
+
+        }else{
+            console.log(`WARNING: level attempted to load at index ${index} does not exist!`);
+        }
+    },
+
+    start: function(){
+        this.loadLevel(0);
+    },
+
+    getCurrentLevel: function () { return this.levels[this.currentLevelIndex]; }
+
+}
+
 function getCanvasPosition(worldPos){
     return [worldPos[0] * tileSize, worldPos[1] * tileSize];
+}
+
+function start(){
+
+    levelManager.start();
+
+    window.requestAnimationFrame(update);
+
 }
 
 function update(){
@@ -306,15 +367,31 @@ function update(){
 
 }
 
+/**
+ * Checks whether a point is within a box.
+ * 
+ * @param {[x, y]} point 
+ * @param {[[x, y], [width, height]]} box 
+ * @returns {boolean}
+ */
+const pointInBox = (point, box) => (point[0] >= box[0][0] && point[0] <= box[0][0] + box[1][0] && point[1] >= box[0][1] && point[1] <= box[0][1] + box[1][1])
+
 charController.init();
 
-const player = new Player([40, 25]);
-loadedPlatforms.push(new Platform([10, 11], [25, 1]));
-loadedPlatforms.push(new Platform([15, 6], [25, 1]));
-loadedPlatforms.push(new Platform([20, 3], [25, 1]));
-loadedPlatforms.push(new Platform([40, 15], [4, 1]));
-loadedPlatforms.push(new Platform([15, 25], [4, 1]));
-loadedPlatforms.push(new Platform([15, 6], [25, 1]));
-loadedPlatforms.push(new Platform([30, 30], [25, 1]));
+const player = new Player();
 
-window.requestAnimationFrame(update);
+let sampleLevelPlatforms = [];
+
+sampleLevelPlatforms.push(new Platform([10, 11], [25, 1]));
+sampleLevelPlatforms.push(new Platform([15, 6], [25, 1]));
+sampleLevelPlatforms.push(new Platform([20, 3], [25, 1]));
+sampleLevelPlatforms.push(new Platform([40, 15], [4, 1]));
+sampleLevelPlatforms.push(new Platform([15, 25], [4, 1]));
+sampleLevelPlatforms.push(new Platform([15, 6], [25, 1]));
+sampleLevelPlatforms.push(new Platform([30, 30], [25, 1]));
+
+levelManager.levels.push(new Level([], sampleLevelPlatforms, [40, 25], [[-10, -10], [2 * tilesVisibleVertically + 20, tilesVisibleVertically + 100]]));
+
+levelManager.levels.push(new Level([], [new Platform([15, 15], [10, 1])], [18, 12]));
+
+start();
