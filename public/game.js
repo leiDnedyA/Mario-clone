@@ -15,16 +15,28 @@ var loadedPlatforms = [];
 var deltaTime = 0;
 var lastTime = Date.now();
 
+var userHasInteracted = false;
+
+const colors = {
+    background: 'black',
+    platform: 'white',
+    player: 'white'
+}
+
+window.addEventListener('click', _ => { userHasInteracted = true}, {once: true});
+window.addEventListener('keydown', _=>{ userHasInteracted = true}, {once: true});
+
 window.addEventListener('contextmenu',e=>{e.preventDefault()});
 
 window.addEventListener('resize', e=>{canvas.width = window.innerWidth; canvas.height = window.innerHeight; tileSize = canvas.height / tilesVisibleVertically;});
 
 class Level {
-    constructor(entities = [], platforms = [], playerStartPos = [0, 0], boundingBox = [[0, 0], [tilesVisibleVertically * 1.5, tilesVisibleVertically]]){
+    constructor(entities = [], platforms = [], playerStartPos = [0, 0], boundingBox = [[0, 0], [tilesVisibleVertically * 1.5, tilesVisibleVertically]], backgroundMusic){
         this.entities = entities;
         this.platforms = platforms;
         this.playerStartPos = playerStartPos;
         this.boundingBox = boundingBox;
+        this.backgroundMusic = backgroundMusic;
     }
 }
 
@@ -199,11 +211,13 @@ class Player extends Entity {
 
     jump() {
         this.velocity[1] = -this.jumpPower;
+        audioManager.playSoundEffect('jump0');
     }
 
     die() {
         this.position = levelManager.getCurrentLevel().playerStartPos;
-        this.velocity = [0, 0]
+        this.velocity = [0, 0];
+        audioManager.playSoundEffect('death1');
     }
 
     tryJump() {
@@ -290,13 +304,16 @@ const renderer = {
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        ctx.fillStyle = "#000000";
+        ctx.fillStyle = colors.background;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = colors.platform;
 
         for(let i in loadedPlatforms){
             ctx.fillRect(...this.worldObjToScreenObj(loadedPlatforms[i]));
         }
         
-        ctx.fillStyle = "#ff0000";
+        ctx.fillStyle = colors.player;
 
         ctx.fillRect(...this.worldObjToScreenObj(player));
 
@@ -326,6 +343,12 @@ const levelManager = {
                 entities.push(level.entities[i]);
             }
 
+            if(level.backgroundMusic){
+                audioManager.setMusic(level.backgroundMusic);
+            }else{
+                audioManager.pauseMusic();
+            }
+
             player.position = [...level.playerStartPos];
 
         }else{
@@ -339,6 +362,89 @@ const levelManager = {
 
     getCurrentLevel: function () { return this.levels[this.currentLevelIndex]; }
 
+}
+
+const audioManager = {
+
+    soundEffects: {},
+
+    music: {},
+
+    currentSong: null,
+
+    pauseMusic: function(){
+        if(this.music.hasOwnProperty(this.currentSong)){
+
+            this.music[this.currentSong].pause();
+        }
+    },
+
+    playSoundEffect: function (effectName) {
+        if(this.soundEffects.hasOwnProperty(effectName)){
+            let sound = this.soundEffects[effectName];
+
+            if(!sound.ended){
+                let audioClone = new Audio(sound.src);
+                audioClone.addEventListener('canplay', ()=>{
+                    audioClone.play();
+                });
+                audioClone.addEventListener('ended', ()=>{
+                    audioClone.remove();
+                })
+            }
+
+            sound.play();
+            
+        }else{
+            console.log(`WARNING: sound effect '${effectName}' was requested to play but does not exist!`);
+        }
+    },
+
+    setMusic: function (songName) {
+        
+        if(this.music.hasOwnProperty(songName)){
+
+            if (this.currentSong) {
+                this.music.currentSong.pause();
+            }
+
+            let song = this.music[songName];
+
+            if(userHasInteracted){
+                song.play();
+            }else{
+                window.addEventListener('keydown', _=>{song.play()}, {once: true});
+            }         
+
+
+        } else {
+            console.log(`WARNING: song '${songName}' was requested to play but does not exist!`);
+        }
+
+    },
+
+    /**
+     * Loads in library of songs
+     * 
+     * @param {[{title: String, fileName: String}]} library 
+     */
+    loadLibrary: function(library) {
+        for(let i in library){
+            let songData = library[i];
+
+            if(songData.category === 'music'){
+                let audio = new Audio(`sfx/${songData.fileName}`);
+                audio.loop = true;
+                this.music[songData.title] = audio;
+            }else if (songData.category === 'sfx'){
+                this.soundEffects[songData.title] = new Audio(`sfx/${songData.fileName}`);
+                this.soundEffects[songData.title].volume = 0;
+                this.soundEffects[songData.title].addEventListener('ended', _=>{this.soundEffects[songData.title].volume = 1});
+                this.soundEffects[songData.title].play();
+            }
+
+        }
+    }
 }
 
 function getCanvasPosition(worldPos){
@@ -380,6 +486,18 @@ charController.init();
 
 const player = new Player();
 
+//categories include 'music' and 'sfx'
+const musicLibrary = [
+    { title: 'backgroundPiano', fileName: 'classical music background.wav', category: 'music' }, 
+    { title: 'harpsicordIntro', fileName: 'anita-harpsichord-intro.wav', category: 'sfx'},
+    { title: 'jump0', fileName: 'jump0.wav', category: 'sfx' },
+    { title: 'jump1', fileName: 'jump1.wav', category: 'sfx' },
+    { title: 'trapBackground', fileName: 'trap background.wav', category: 'music'},
+    { title: 'death0', fileName: 'death0.wav', category: 'sfx'},
+    { title: 'death1', fileName: 'death1.wav', category: 'sfx' },
+];
+audioManager.loadLibrary(musicLibrary);
+
 let sampleLevelPlatforms = [];
 
 sampleLevelPlatforms.push(new Platform([10, 11], [25, 1]));
@@ -390,7 +508,7 @@ sampleLevelPlatforms.push(new Platform([15, 25], [4, 1]));
 sampleLevelPlatforms.push(new Platform([15, 6], [25, 1]));
 sampleLevelPlatforms.push(new Platform([30, 30], [25, 1]));
 
-levelManager.levels.push(new Level([], sampleLevelPlatforms, [40, 25], [[-10, -10], [2 * tilesVisibleVertically + 20, tilesVisibleVertically + 100]]));
+levelManager.levels.push(new Level([], sampleLevelPlatforms, [40, 25], [[-10, -10], [2 * tilesVisibleVertically + 20, tilesVisibleVertically + 100]], 'backgroundPiano'));
 
 levelManager.levels.push(new Level([], [new Platform([15, 15], [10, 1])], [18, 12]));
 
