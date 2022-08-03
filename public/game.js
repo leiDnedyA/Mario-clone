@@ -370,12 +370,12 @@ const audioManager = {
 
     music: {},
 
-    currentSong: null,
+    currentSongName: null,
 
     pauseMusic: function(){
-        if(this.music.hasOwnProperty(this.currentSong)){
+        if(this.music.hasOwnProperty(this.currentSongName)){
 
-            this.music[this.currentSong].pause();
+            this.music[this.currentSongName].pause();
         }
     },
 
@@ -402,23 +402,25 @@ const audioManager = {
 
     setMusic: function (songName) {
         
-        if(this.music.hasOwnProperty(songName)){
+        if (songName !== this.currentSongName){
+            if (this.music.hasOwnProperty(songName)) {
 
-            if (this.currentSong) {
-                this.music.currentSong.pause();
+                if (this.currentSongName) {
+                    this.music[this.currentSongName].pause();
+                }
+
+                let song = this.music[songName];
+
+                if (userHasInteracted) {
+                    song.play();
+                } else {
+                    window.addEventListener('keydown', _ => { song.play() }, { once: true });
+                }
+
+
+            } else {
+                console.log(`WARNING: song '${songName}' was requested to play but does not exist!`);
             }
-
-            let song = this.music[songName];
-
-            if(userHasInteracted){
-                song.play();
-            }else{
-                window.addEventListener('keydown', _=>{song.play()}, {once: true});
-            }         
-
-
-        } else {
-            console.log(`WARNING: song '${songName}' was requested to play but does not exist!`);
         }
 
     },
