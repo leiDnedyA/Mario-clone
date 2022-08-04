@@ -8,6 +8,7 @@ canvas.height = window.innerHeight;
 const tilesVisibleVertically = 40;
 
 var tileSize = canvas.height / tilesVisibleVertically;
+var particleSize = 3;
 
 var entities = [];
 var loadedPlatforms = [];
@@ -119,17 +120,21 @@ class Entity {
 
         //gravity stuff
 
-        let groundedTestPos = [this.position[0], this.position[1] + .01];
+        let groundedTestPos = [this.position[0], this.position[1] + .05];
         let groundedCollisionTest = this.checkCollisions(groundedTestPos);
 
-        if(groundedCollisionTest[1] === groundedTestPos[1]){
-            if(this.isGrounded){
+        if(groundedCollisionTest[1] < groundedTestPos[1]){
+
+            this.isGrounded = true;
+
+        }else{
+
+            if (this.isGrounded) {
                 this.lastGroundTime = Date.now();
             }
             this.isGrounded = false;
-            this.velocity[1] += this.gravity * deltaTime/1000;
-        }else{
-            this.isGrounded = true;
+            this.velocity[1] += this.gravity * deltaTime / 1000;
+
         }
 
 
@@ -212,6 +217,7 @@ class Player extends Entity {
     jump() {
         this.velocity[1] = -this.jumpPower;
         audioManager.playSoundEffect('jump0');
+        particleManager.createParticle(this.position, 'white');
     }
 
     die() {
@@ -221,6 +227,7 @@ class Player extends Entity {
     }
 
     tryJump() {
+
         if (this.isGrounded || Date.now() - this.lastGroundTime <= this.lateJumpTimer) {
             this.jump();
         }else{
@@ -230,18 +237,18 @@ class Player extends Entity {
     }
 
     update(deltaTime) {
-        super.update(deltaTime);
-
         //jumps in case of early button press within jumpTimer limit
-        if(this.checkJumpRequest){
-            if(Date.now() - this.lastJumpRequest <= this.earlyJumpTimer){
-                if(this.isGrounded){
+        if (this.checkJumpRequest) {
+            if (Date.now() - this.lastJumpRequest <= this.earlyJumpTimer) {
+                if (this.isGrounded) {
                     this.jump();
                 }
-            }else{
+            } else {
                 this.checkJumpRequest = false;
             }
         }
+        
+        super.update(deltaTime);
 
         if(!pointInBox(this.position, levelManager.getCurrentLevel().boundingBox)) this.die();
 
@@ -296,6 +303,8 @@ const charController = {
 
 const renderer = {
     
+    worldPosToScreenPos: pos=>[pos[0]*tileSize, pos[1]*tileSize],
+
     worldObjToScreenObj: obj=>{
         return [obj.position[0]*tileSize, obj.position[1]*tileSize, obj.dimensions[0]*tileSize, obj.dimensions[1]*tileSize];
     },
@@ -316,6 +325,22 @@ const renderer = {
         ctx.fillStyle = colors.player;
 
         ctx.fillRect(...this.worldObjToScreenObj(player));
+
+        for(let i in particleManager.currentParticles){
+            
+            let particle = particleManager.currentParticles[i];
+            ctx.fillStyle = particle.color;
+            ctx.globalAlpha = particle.opacity;
+
+            let screenObj = [...this.worldPosToScreenPos(particle.position)];
+            screenObj.push(particleSize);
+            screenObj.push(particleSize);
+
+            ctx.fillRect(...screenObj);
+
+        }
+
+        ctx.globalAlpha = 1;
 
     }
 };
@@ -469,6 +494,7 @@ function update(){
 
     renderer.draw();
     charController.update();
+    particleManager.update(deltaTime);
     player.update(deltaTime);
 
     window.requestAnimationFrame(update);
