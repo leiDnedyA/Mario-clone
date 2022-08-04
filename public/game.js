@@ -386,7 +386,7 @@ const renderer = {
             
             let particle = particleManager.currentParticles[i];
             ctx.fillStyle = particle.color;
-            ctx.globalAlpha = particle.opacity;
+            ctx.globalAlpha = Math.abs(particle.opacity);
 
             let screenObj = [...this.worldPosToScreenPos(particle.position)];
             screenObj.push(particleSize);
