@@ -173,6 +173,7 @@ class Player extends Entity {
 
         this.lastJumpRequest = Date.now();
         this.checkJumpRequest = false;
+        this.lastJump = Date.now();
 
     }
 
@@ -222,6 +223,7 @@ class Player extends Entity {
         this.velocity[1] = -this.jumpPower;
         audioManager.playSoundEffect('jump0');
         particleManager.createParticleCluster(this.position, 10 * particleMultiplier, 'white');
+        this.lastJump = Date.now();
     }
 
     die() {
@@ -258,9 +260,16 @@ class Player extends Entity {
 
     tryJump() {
 
-        if (this.isGrounded || Date.now() - this.lastGroundTime <= this.lateJumpTimer) {
+        let jumpDelay = Date.now() - this.lastJump;
+
+        if (this.isGrounded) {
+            //normal jump
+            this.jump();
+        } else if (Date.now() - this.lastGroundTime <= this.lateJumpTimer && jumpDelay > 200){
+            //late jump
             this.jump();
         }else{
+            //setup for early jump
             this.checkJumpRequest = true;
             this.lastJumpRequest = Date.now();
         }
