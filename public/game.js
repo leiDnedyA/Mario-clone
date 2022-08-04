@@ -355,6 +355,20 @@ const renderer = {
         ctx.fillStyle = colors.background;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+        for(let i in textManager.currentTexts){
+            let t = textManager.currentTexts[i];
+
+            ctx.fillStyle = t.color;
+            ctx.globalAlpha = t.opacity;
+            ctx.font = `${t.size * tileSize}px ${t.font}`;
+            let screenPos = this.worldPosToScreenPos(t.position);
+
+            ctx.fillText(t.message, screenPos[0], screenPos[1]);
+
+        }
+
+        ctx.globalAlpha = 1;
+
         ctx.fillStyle = colors.platform;
 
         for(let i in loadedPlatforms){
@@ -513,6 +527,25 @@ const audioManager = {
     }
 }
 
+const textManager = {
+    
+    currentTexts: [],
+
+    createText: function(message, position){
+        this.currentTexts.push(new OnscreenText(message, position));
+    },
+
+    update: function(deltaTime){
+        for(let i in this.currentTexts){
+            let t = this.currentTexts[i];
+            t.update(deltaTime);
+            if (t.finished){
+                this.currentTexts.splice(i, 1);
+            }
+        }
+    }
+}
+
 function getCanvasPosition(worldPos){
     return [worldPos[0] * tileSize, worldPos[1] * tileSize];
 }
@@ -532,6 +565,7 @@ function update(){
     lastTime = currentTime;
 
     renderer.draw();
+    textManager.update(deltaTime);
     charController.update();
     particleManager.update(deltaTime);
     player.update(deltaTime);
