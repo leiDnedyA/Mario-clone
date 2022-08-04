@@ -12,7 +12,7 @@ class Particle{
     constructor(position, color = 'white', velocity = [(Math.random() - .5) * 50, (Math.random() - .5) * 50], duration = 2000){
         this.startTime = Date.now();
         this.position = position;
-        this.color = 'red';
+        this.color = color;
         this.velocity = velocity;
         this.duration = duration;
         this.gravity = 1;
@@ -44,13 +44,13 @@ const particleManager = {
     
     createParticle: function(position, color = 'white'){
 
-        this.currentParticles.push(new Particle(position, color));
+        this.currentParticles.push(new Particle([...position], color));
 
     },
 
     createParticleCluster: function (position, count = 10, color = 'white'){
         for(let i = 0; i < count; i++){
-            this.currentParticles.push(new Particle(position, color));
+            this.currentParticles.push(new Particle([...position], color));
 
         }
     },

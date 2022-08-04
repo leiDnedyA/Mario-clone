@@ -10,8 +10,12 @@ const tilesVisibleVertically = 40;
 var tileSize = canvas.height / tilesVisibleVertically;
 var particleSize = 3;
 
+var particleMultiplier = 1;
+
 var entities = [];
 var loadedPlatforms = [];
+
+var cameraOffset = [0, 0]; //will probably implement later
 
 var deltaTime = 0;
 var lastTime = Date.now();
@@ -217,13 +221,39 @@ class Player extends Entity {
     jump() {
         this.velocity[1] = -this.jumpPower;
         audioManager.playSoundEffect('jump0');
-        particleManager.createParticle(this.position, 'white');
+        particleManager.createParticleCluster(this.position, 10 * particleMultiplier, 'white');
     }
 
     die() {
+
+        //makes red particles where player died or on edge of screen if player is offscreen
+        let particlesPosition = [...this.position];
+
+        let bounds = [[cameraOffset[0], cameraOffset[1]], [canvas.width / tileSize, canvas.height / tileSize]]
+
+        if (!pointInBox(this.position, bounds)) {
+            if (particlesPosition[0] < bounds[0][0]) {
+                particlesPosition[0] = bounds[0][0];
+            } else if (particlesPosition[0] > bounds[1][0]) {
+                particlesPosition[0] = bounds[1][0] + bounds[0][0];
+            }
+
+            if (particlesPosition[1] < bounds[0][1]) {
+                particlesPosition[1] = bounds[1][0];
+            } else if (particlesPosition[1] > bounds[1][1]) {
+                particlesPosition[1] = bounds[1][1] + bounds[0][1];
+            }
+        }
+
+        particleManager.createParticleCluster(particlesPosition, 10 * particleMultiplier, 'red');
+
+        //relocates player
+
         this.position = levelManager.getCurrentLevel().playerStartPos;
         this.velocity = [0, 0];
         audioManager.playSoundEffect('death1');
+
+
     }
 
     tryJump() {
