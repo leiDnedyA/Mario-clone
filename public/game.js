@@ -220,9 +220,12 @@ class Player extends Entity {
     }
 
     jump() {
+
+        let velocityParticleFactor = (Math.abs(this.velocity[1]) + Math.abs(this.velocity[0])) / 30;
+
         this.velocity[1] = -this.jumpPower;
         audioManager.playSoundEffect('jump0');
-        particleManager.createParticleCluster(this.position, 10 * particleMultiplier, 'white');
+        particleManager.createParticleCluster(this.position, (10 * particleMultiplier) * (1 + velocityParticleFactor), 'white');
         this.lastJump = Date.now();
     }
 
@@ -531,8 +534,8 @@ const textManager = {
     
     currentTexts: [],
 
-    createText: function(message, position){
-        this.currentTexts.push(new OnscreenText(message, position));
+    createText: function(message, position, size = 1, duration = 2000){
+        this.currentTexts.push(new OnscreenText(message, position, size, duration));
     },
 
     update: function(deltaTime){
