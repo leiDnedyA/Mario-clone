@@ -36,12 +36,24 @@ window.addEventListener('contextmenu',e=>{e.preventDefault()});
 window.addEventListener('resize', e=>{canvas.width = window.innerWidth; canvas.height = window.innerHeight; tileSize = canvas.height / tilesVisibleVertically;});
 
 class Level {
-    constructor(entities = [], platforms = [], playerStartPos = [0, 0], boundingBox = [[0, 0], [tilesVisibleVertically * 1.5, tilesVisibleVertically]], backgroundMusic){
+
+    /**
+     * Creates new Level instance.
+     * 
+     * @param {[Entity]} entities list of entities in level 
+     * @param {[Platform]} platforms list of platforms in level
+     * @param {[x, y]} playerStartPos starting position of player in level
+     * @param {[[x, y], [width, height]]} boundingBox bounding box of level.
+     * @param {string} backgroundMusic name of background track for level.
+     * @param {[PositionEvent]} positionEvents list of position triggers in level.
+     */
+    constructor(entities = [], platforms = [], playerStartPos = [0, 0], boundingBox = [[0, 0], [tilesVisibleVertically * 1.5, tilesVisibleVertically]], backgroundMusic = 'backgroundPiano', positionEvents = []){
         this.entities = entities;
         this.platforms = platforms;
         this.playerStartPos = playerStartPos;
         this.boundingBox = boundingBox;
         this.backgroundMusic = backgroundMusic;
+        this.positionEvents = positionEvents;
     }
 }
 
@@ -49,6 +61,25 @@ class Platform {
     constructor(position = [0, 0], dimensions = [0, 0]){
         this.position = position;
         this.dimensions = dimensions;
+    }
+}
+
+// class used to store position-based events within levels e.g player walks over a tile and text appears
+class PositionEvent {
+
+    /**
+     * Creates PositionEvent instance.
+     * 
+     * @param {[x, y]} position position that event occurs at
+     * @param {function} callback function that executes when event is triggered
+     * @param {number} range range within which the event can be triggered
+     * @param {boolean} isRepeatable whether or not the event is a one-time thing or repeats
+     */
+    constructor(position = [0, 0], callback, range = 5, isRepeatable = true){
+        this.position = position;
+        this.callback = callback;
+        this.range = range;
+        this.isRepeatable = isRepeatable;
     }
 }
 
