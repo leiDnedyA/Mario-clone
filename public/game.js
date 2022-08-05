@@ -689,9 +689,10 @@ sampleLevelPlatforms.push(new Platform([15, 25], [4, 1]));
 sampleLevelPlatforms.push(new Platform([15, 6], [25, 1]));
 sampleLevelPlatforms.push(new Platform([30, 30], [25, 1]));
 
-let samplePosEvent = new PositionEvent([40, 25], (playerPosition) => {textManager.createText('sample text', [...playerPosition])}, [5, 5], false);
+let samplePosEvent = new PositionEvent([40, 25], (playerPosition) => {textManager.createText('Hello :3', [...playerPosition])}, [5, 5], true, 1000);
+let samplePosEvent2 = new PositionEvent([32, -3], (playerPosition) => { textManager.createText('Ty for testing my game <3', [...playerPosition])}, [10, 6], true, 1000);
 
-levelManager.levels.push(new Level([], sampleLevelPlatforms, [40, 25], [[-10, -10], [2 * tilesVisibleVertically + 20, tilesVisibleVertically + 100]], 'backgroundPiano', [samplePosEvent]));
+levelManager.levels.push(new Level([], sampleLevelPlatforms, [40, 25], [[-10, -10], [2 * tilesVisibleVertically + 20, tilesVisibleVertically + 100]], 'backgroundPiano', [samplePosEvent, samplePosEvent2]));
 
 levelManager.levels.push(new Level([], [new Platform([15, 15], [10, 1])], [18, 12]));
 
