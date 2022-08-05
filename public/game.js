@@ -106,6 +106,8 @@ class PositionEvent {
     execute(playerPosition){
         this.hasExecuted = true;
 
+        this.callback(playerPosition);
+
     }
 }
 /**
@@ -505,6 +507,14 @@ const levelManager = {
         this.loadLevel(0);
     },
 
+    update: function(deltaTime){
+        let posEvents = this.getCurrentLevel().positionEvents;
+        for(let i in posEvents){
+            let e = posEvents[i];
+            e.tryExecution([...player.position]);
+        }
+    },
+
     getCurrentLevel: function () { return this.levels[this.currentLevelIndex]; }
 
 }
@@ -636,6 +646,7 @@ function update(){
     charController.update();
     particleManager.update(deltaTime);
     player.update(deltaTime);
+    levelManager.update(deltaTime);
 
     window.requestAnimationFrame(update);
 
@@ -676,7 +687,9 @@ sampleLevelPlatforms.push(new Platform([15, 25], [4, 1]));
 sampleLevelPlatforms.push(new Platform([15, 6], [25, 1]));
 sampleLevelPlatforms.push(new Platform([30, 30], [25, 1]));
 
-levelManager.levels.push(new Level([], sampleLevelPlatforms, [40, 25], [[-10, -10], [2 * tilesVisibleVertically + 20, tilesVisibleVertically + 100]], 'backgroundPiano'));
+let samplePosEvent = new PositionEvent([40, 25], (playerPosition) => {textManager.createText('sample text', [...playerPosition])}, [5, 5], false);
+
+levelManager.levels.push(new Level([], sampleLevelPlatforms, [40, 25], [[-10, -10], [2 * tilesVisibleVertically + 20, tilesVisibleVertically + 100]], 'backgroundPiano', [samplePosEvent]));
 
 levelManager.levels.push(new Level([], [new Platform([15, 15], [10, 1])], [18, 12]));
 
