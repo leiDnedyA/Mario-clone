@@ -71,17 +71,50 @@ class PositionEvent {
      * Creates PositionEvent instance.
      * 
      * @param {[x, y]} position position that event occurs at
-     * @param {function} callback function that executes when event is triggered
-     * @param {number} range range within which the event can be triggered
+     * @param {PositionEvent~posEventCallback} callback function that executes when event is triggered
+     * @param {[x, y]} range range within which the event can be triggered
      * @param {boolean} isRepeatable whether or not the event is a one-time thing or repeats
      */
-    constructor(position = [0, 0], callback, range = 5, isRepeatable = true){
+    constructor(position = [0, 0], callback, range = [5, 5], isRepeatable = true){
         this.position = position;
         this.callback = callback;
         this.range = range;
         this.isRepeatable = isRepeatable;
+        this.hasExecuted = false;
+    }
+
+    /**
+     * Tests conditions for event and executes if conditions are met.
+     * 
+     * @param {[x, y]} playerPosition current position of player
+     */
+    tryExecution(playerPosition){
+        if(this.isRepeatable || (!this.isRepeatable && !this.hasExecuted)){
+            let xPosCheck = playerPosition[0] >= this.position[0] - this.range[0] && playerPosition[0] <= this.position[0] + this.range[0];
+            let yPosCheck = playerPosition[1] >= this.position[1] - this.range[1] && playerPosition[1] <= this.position[1] + this.range[1];
+            if(xPosCheck && yPosCheck){
+                this.execute(playerPosition);
+            }
+        }
+    }
+
+    /**
+     * Executes callback function for event.
+     * 
+     * @param {[x, y]} playerPosition current position of player
+     */
+    execute(playerPosition){
+        this.hasExecuted = true;
+
     }
 }
+/**
+ * Callback function used in PositionEvent class.
+ * @callback PositionEvent~posEventCallback
+ * @param {[x, y]} playerPosition current position of player.
+ */
+
+
 
 class Entity {
     constructor(position = [0, 0], maxSpeed){
