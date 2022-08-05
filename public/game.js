@@ -74,12 +74,15 @@ class PositionEvent {
      * @param {PositionEvent~posEventCallback} callback function that executes when event is triggered
      * @param {[x, y]} range range within which the event can be triggered
      * @param {boolean} isRepeatable whether or not the event is a one-time thing or repeats
+     * @param {number} repeatDelay millisecond delay between repeats if applicable
      */
-    constructor(position = [0, 0], callback, range = [5, 5], isRepeatable = true){
+    constructor(position = [0, 0], callback, range = [5, 5], isRepeatable = true, repeatDelay = 5000){
         this.position = position;
         this.callback = callback;
         this.range = range;
         this.isRepeatable = isRepeatable;
+        this.repeatDelay = repeatDelay;
+        this.lastExecution = 0;
         this.hasExecuted = false;
     }
 
@@ -89,7 +92,7 @@ class PositionEvent {
      * @param {[x, y]} playerPosition current position of player
      */
     tryExecution(playerPosition){
-        if(this.isRepeatable || (!this.isRepeatable && !this.hasExecuted)){
+        if((this.isRepeatable && Date.now() - this.lastExecution >= this.repeatDelay) || (!this.isRepeatable && !this.hasExecuted)){
             let xPosCheck = playerPosition[0] >= this.position[0] - this.range[0] && playerPosition[0] <= this.position[0] + this.range[0];
             let yPosCheck = playerPosition[1] >= this.position[1] - this.range[1] && playerPosition[1] <= this.position[1] + this.range[1];
             if(xPosCheck && yPosCheck){
@@ -104,10 +107,9 @@ class PositionEvent {
      * @param {[x, y]} playerPosition current position of player
      */
     execute(playerPosition){
-        this.hasExecuted = true;
-
         this.callback(playerPosition);
-
+        this.hasExecuted = true;
+        this.lastExecution = Date.now();
     }
 }
 /**
