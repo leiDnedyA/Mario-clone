@@ -144,8 +144,6 @@ class PositionEvent {
  * @param {[x, y]} playerPosition current position of player.
  */
 
-
-
 class Entity {
     constructor(position = [0, 0], maxSpeed){
         this.position = position;
@@ -361,6 +359,7 @@ class Player extends Entity {
             if(super.positionTest(this.position, d)){
                 levelManager.loadLevel(d.destinationLevelIndex);
                 this.position = [...d.exitPosition];
+                audioManager.playSoundEffect('door1');
             }
 
         }
@@ -735,6 +734,7 @@ const musicLibrary = [
     { title: 'trapBackground', fileName: 'trap background.wav', category: 'music'},
     { title: 'death0', fileName: 'death0.wav', category: 'sfx'},
     { title: 'death1', fileName: 'death1.wav', category: 'sfx' },
+    { title: 'door1', fileName: 'door1.wav', category: 'sfx'},
 ];
 audioManager.loadLibrary(musicLibrary);
 
