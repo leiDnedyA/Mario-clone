@@ -52,6 +52,14 @@ const particleManager = {
 
     },
 
+    /**
+     * Creates a cluster of particles.
+     * 
+     * @param {[x, y]} position 
+     * @param {number} count 
+     * @param {string} color 
+     */
+
     createParticleCluster: function (position, count = 10, color = 'white'){
         for(let i = 0; i < count; i++){
             this.currentParticles.push(new Particle([...position], color));

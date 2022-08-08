@@ -28,6 +28,7 @@ const colors = {
     platform: 'white',
     player: 'white',
     door: '#00ff00',
+    green: '#00ff00'
 }
 
 const imageSRCs = {
@@ -360,6 +361,7 @@ class Player extends Entity {
                 levelManager.loadLevel(d.destinationLevelIndex);
                 this.position = [...d.exitPosition];
                 audioManager.playSoundEffect('door1');
+                particleManager.createParticleCluster([...player.position], 10, colors.green);
             }
 
         }
