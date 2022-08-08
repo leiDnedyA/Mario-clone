@@ -16,6 +16,7 @@ class Particle{
         this.velocity = velocity;
         this.duration = duration;
         this.gravity = 1;
+        this.friction = .9;
         this.opacity = 1;
 
         this.finished = false;
@@ -23,8 +24,11 @@ class Particle{
 
     update(deltaTime){
     
+        this.velocity[0] -= (this.friction * this.velocity[0]) * (deltaTime / 1000);
+        this.velocity[1] -= (this.friction * this.velocity[1]) * (deltaTime / 1000);
+
         this.velocity[1] += this.gravity * (deltaTime/1000);
-    
+
         this.position[0] += this.velocity[0] * (deltaTime / 1000);
         this.position[1] += this.velocity[1] * (deltaTime / 1000);
 
