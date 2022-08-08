@@ -28,4 +28,18 @@ class OnscreenText{
             this.finished = true;
         }
     }
+
+    /**
+     * Generates a bounding box.
+     * 
+     * @param {number} tileSize 
+     * @param {CanvasRenderingContext2D} ctx
+     * @return {[x, y, WindowEventHandlers, height]}
+     */
+    getBoundingBox(tileSize, ctx){
+        ctx.font = `${this.size * tileSize}px ${this.font}`;
+        let textMetrics = ctx.measureText(this.message);
+        return [this.position[0], this.position[1], textMetrics.width / tileSize, this.size];
+    }
+
 }

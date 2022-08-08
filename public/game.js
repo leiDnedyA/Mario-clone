@@ -666,7 +666,37 @@ const textManager = {
     
     currentTexts: [],
 
+    /**
+     * Checks whether text would overlap with any current onscreen texts.
+     * 
+     * @param {OnscreenText} onscreenTextObj
+     * 
+     * @return {boolean} true: overlap, false: no overlap 
+     */
+    checkTextOverlaps: function(onscreenTextObj){
+        let boundingBox = onscreenTextObj.getBoundingBox(tileSize, ctx);
+        
+        for(let i in this.currentTexts){
+            let t = this.currentTexts[i];
+            let tBoundingBox = t.getBoundingBox(tileSize, ctx);
+            if(checkBoxOverlap(boundingBox, tBoundingBox)){
+                return true;
+            }
+        }
+
+        return false;
+    },
+
     createText: function(message, position, size = 1, duration = 2000){
+        
+        let onscreenTextObj = new OnscreenText(message, position, size, duration);
+
+        if(!this.checkTextOverlaps(onscreenTextObj)){
+            this.currentTexts.push(onscreenTextObj);
+        }  
+    },
+
+    forceCreateText: function(message, position, size = 1, duration = 2000){
         this.currentTexts.push(new OnscreenText(message, position, size, duration));
     },
 
@@ -687,6 +717,25 @@ const textManager = {
 
 function getCanvasPosition(worldPos){
     return [worldPos[0] * tileSize, worldPos[1] * tileSize];
+}
+
+/**
+ * Checks for overlap between 2 bounding boxes.
+ * 
+ * @param {[x, y, width, height]} box1 
+ * @param {[x, y, width, height]} box2 
+ * @returns {boolean} true: overlap exists, false: overlap doesn't exist
+ */
+function checkBoxOverlap(box1, box2){
+
+    //the names of these variables reference direction from the entity's perspective
+    let positiveXCollision = (box1[0] + box1[2] > box2[0]);
+    let negativeXCollision = (box1[0] < box2[0] + box2[2]);
+    let positiveYCollision = (box1[1] + box1[3] > box2[1]);
+    let negativeYCollision = (box1[1] < box2[1] + box2[3]);
+
+    return (positiveXCollision && negativeXCollision && positiveYCollision && negativeYCollision);
+
 }
 
 function start(){
