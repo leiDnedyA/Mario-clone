@@ -10,10 +10,11 @@ const tilesVisibleVertically = 40;
 var tileSize = canvas.height / tilesVisibleVertically;
 var particleSize = 3;
 
-var particleMultiplier = 1;
+var particleMultiplier = 1.5;
 
 var entities = [];
 var loadedPlatforms = [];
+var loadedDoors = [];
 
 var cameraOffset = [0, 0]; //will probably implement later
 
@@ -25,7 +26,21 @@ var userHasInteracted = false;
 const colors = {
     background: 'black',
     platform: 'white',
-    player: 'white'
+    player: 'white',
+    door: '#00ff00',
+}
+
+const imageSRCs = {
+    door: 'door.png',
+}
+
+const spriteImages = {
+}
+
+for(let i in imageSRCs){
+    let img = document.createElement('IMG');
+    img.src = `textures/${imageSRCs[i]}`;
+    spriteImages[i] = img;
 }
 
 window.addEventListener('click', _ => { userHasInteracted = true}, {once: true});
@@ -46,14 +61,16 @@ class Level {
      * @param {[[x, y], [width, height]]} boundingBox bounding box of level.
      * @param {string} backgroundMusic name of background track for level.
      * @param {[PositionEvent]} positionEvents list of position triggers in level.
+     * @param {[Door]} doors list of doors in level.
      */
-    constructor(entities = [], platforms = [], playerStartPos = [0, 0], boundingBox = [[0, 0], [tilesVisibleVertically * 1.5, tilesVisibleVertically]], backgroundMusic = 'backgroundPiano', positionEvents = []){
+    constructor(entities = [], platforms = [], playerStartPos = [0, 0], boundingBox = [[0, 0], [tilesVisibleVertically * 1.5, tilesVisibleVertically]], backgroundMusic = 'backgroundPiano', positionEvents = [], doors = []){
         this.entities = entities;
         this.platforms = platforms;
         this.playerStartPos = playerStartPos;
         this.boundingBox = boundingBox;
         this.backgroundMusic = backgroundMusic;
         this.positionEvents = positionEvents;
+        this.doors = doors;
     }
 }
 
@@ -61,6 +78,15 @@ class Platform {
     constructor(position = [0, 0], dimensions = [0, 0]){
         this.position = position;
         this.dimensions = dimensions;
+    }
+}
+
+class Door {
+    constructor(position = [0, 0], dimensions = [1, 1], destinationLevelIndex = 0, exitPosition = [10, 10]){
+        this.position = position;
+        this.dimensions = dimensions;
+        this.destinationLevelIndex = destinationLevelIndex;
+        this.exitPosition = exitPosition;
     }
 }
 
@@ -135,6 +161,18 @@ class Entity {
     
     }
 
+    positionTest(pos, platform){
+
+        //the names of these variables reference direction from the entity's perspective
+        let positiveXCollision = (pos[0] + this.dimensions[0] > platform.position[0]);
+        let negativeXCollision = (pos[0] < platform.position[0] + platform.dimensions[0]);
+        let positiveYCollision = (pos[1] + this.dimensions[1] > platform.position[1]);
+        let negativeYCollision = (pos[1] < platform.position[1] + platform.dimensions[1]);
+
+        return (positiveXCollision && negativeXCollision && positiveYCollision && negativeYCollision);
+
+    }
+
     /**
      * Checks for collisions between entity and loaded platforms.
      * 
@@ -146,25 +184,12 @@ class Entity {
 
         let result = [...potentialPosition];
 
-        //checks if collision occurs at certain position and returns true or false
-        let positionTest = (pos, platform)=>{
-
-            //the names of these variables reference direction from the entity's perspective
-            let positiveXCollision = (pos[0] + this.dimensions[0] > platform.position[0]);
-            let negativeXCollision = (pos[0] < platform.position[0] + platform.dimensions[0]);
-            let positiveYCollision = (pos[1] + this.dimensions[1] > platform.position[1]);
-            let negativeYCollision = (pos[1] < platform.position[1] + platform.dimensions[1]);
-
-            return (positiveXCollision && negativeXCollision && positiveYCollision && negativeYCollision);
-
-        }
-
         for(let i in loadedPlatforms){
             let platform = loadedPlatforms[i];
 
-            if (positionTest(result, platform)){
+            if (this.positionTest(result, platform)){
                 
-                if (positionTest([this.position[0], result[1]], platform)){
+                if (this.positionTest([this.position[0], result[1]], platform)){
 
                     if (this.position[1] < potentialPosition[1]) {
                         result[1] = platform.position[1] - this.dimensions[1];
@@ -329,6 +354,18 @@ class Player extends Entity {
 
     }
 
+    doorRequest(){
+        for(let i in loadedDoors){
+            let d = loadedDoors[i];
+
+            if(super.positionTest(this.position, d)){
+                levelManager.loadLevel(d.destinationLevelIndex);
+                this.position = [...d.exitPosition];
+            }
+
+        }
+    }
+
     tryJump() {
 
         let jumpDelay = Date.now() - this.lastJump;
@@ -345,6 +382,7 @@ class Player extends Entity {
             this.lastJumpRequest = Date.now();
         }
     }
+
 
     update(deltaTime) {
         //jumps in case of early button press within jumpTimer limit
@@ -369,6 +407,7 @@ const charController = {
     keysDown: {
         "KeyA": false,
         "KeyD": false,
+        "KeyW": false,
         "Space": false
     },
 
@@ -376,6 +415,9 @@ const charController = {
     eventKeys: {
         "Space": ()=>{
             player.tryJump();
+        },
+        "KeyW": ()=>{
+            player.doorRequest();
         }
     },
 
@@ -445,7 +487,14 @@ const renderer = {
         for(let i in loadedPlatforms){
             ctx.fillRect(...this.worldObjToScreenObj(loadedPlatforms[i]));
         }
-        
+
+        for(let i in loadedDoors){
+            let screenObj = this.worldObjToScreenObj(loadedDoors[i]);
+            
+            ctx.drawImage(spriteImages.door, ...screenObj);
+
+        }
+
         ctx.fillStyle = colors.player;
 
         ctx.fillRect(...this.worldObjToScreenObj(player));
@@ -483,6 +532,7 @@ const levelManager = {
             let level = this.levels[index];
             entities = [];
             loadedPlatforms = [];
+            loadedDoors = [];
 
             for(let i in level.platforms){
                 loadedPlatforms.push(level.platforms[i]);
@@ -492,6 +542,10 @@ const levelManager = {
                 entities.push(level.entities[i]);
             }
 
+            for(let i in level.doors){
+                loadedDoors.push(level.doors[i]);
+            }
+
             if(level.backgroundMusic){
                 audioManager.setMusic(level.backgroundMusic);
             }else{
@@ -499,6 +553,7 @@ const levelManager = {
             }
 
             player.position = [...level.playerStartPos];
+            textManager.clearAllTexts();
 
         }else{
             console.log(`WARNING: level attempted to load at index ${index} does not exist!`);
@@ -614,6 +669,10 @@ const textManager = {
         this.currentTexts.push(new OnscreenText(message, position, size, duration));
     },
 
+    clearAllTexts: function(){
+        this.currentTexts = [];
+    },
+
     update: function(deltaTime){
         for(let i in this.currentTexts){
             let t = this.currentTexts[i];
@@ -689,11 +748,15 @@ sampleLevelPlatforms.push(new Platform([15, 25], [4, 1]));
 sampleLevelPlatforms.push(new Platform([15, 6], [25, 1]));
 sampleLevelPlatforms.push(new Platform([30, 30], [25, 1]));
 
-let samplePosEvent = new PositionEvent([40, 25], (playerPosition) => {textManager.createText('Hello :3', [...playerPosition])}, [5, 5], true, 1000);
-let samplePosEvent2 = new PositionEvent([32, -3], (playerPosition) => { textManager.createText('Ty for testing my game <3', [...playerPosition])}, [10, 6], true, 1000);
+let samplePosEvent = new PositionEvent([40, 25], (playerPosition) => {textManager.createText('Use "A", "D", and Space to move', [...playerPosition])}, [5, 5], true, 1000);
+let samplePosEvent2 = new PositionEvent([32, -3], (playerPosition) => { textManager.createText('Press "W" to enter the door!', [...playerPosition])}, [10, 6], true, 1000);
+let samplePosEvent3 = new PositionEvent([18, 14], (playerPosition) => { textManager.createText('Ty for testing my game <3', [...playerPosition]) }, [10, 6], true, 1000);
 
-levelManager.levels.push(new Level([], sampleLevelPlatforms, [40, 25], [[-10, -10], [2 * tilesVisibleVertically + 20, tilesVisibleVertically + 100]], 'backgroundPiano', [samplePosEvent, samplePosEvent2]));
+let sampleDoor = new Door([34, 1], [1, 2], 1, [18, 10]);
+let sampleDoor2 = new Door([16, 13], [1, 2], 0, [34, -1]);
 
-levelManager.levels.push(new Level([], [new Platform([15, 15], [10, 1])], [18, 12]));
+levelManager.levels.push(new Level([], sampleLevelPlatforms, [40, 25], [[-10, -10], [2 * tilesVisibleVertically + 20, tilesVisibleVertically + 100]], 'backgroundPiano', [samplePosEvent, samplePosEvent2], [sampleDoor]));
+
+levelManager.levels.push(new Level([], [new Platform([15, 15], [10, 1])], [18, 12], [[-10, -10], [2 * tilesVisibleVertically + 20, tilesVisibleVertically + 100]], 'backgroundPiano', [samplePosEvent3], [sampleDoor2]));
 
 start();
