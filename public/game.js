@@ -33,6 +33,7 @@ const colors = {
 
 const imageSRCs = {
     door: 'door.png',
+    rightFacingArrow: 'rightFacingArrow.png',
 }
 
 const spriteImages = {
@@ -389,6 +390,18 @@ const renderer = {
 
         }
 
+        for(let i in entities){
+            let entity = entities[i];
+            let entityScreenObj = this.worldObjToScreenObj(entity);
+            if (entity.hasOwnProperty('sprite')) {
+                ctx.drawImage(spriteImages[entity.sprite], ...entityScreenObj);
+            }else if(entity.hasOwnProperty('color')) {
+                ctx.fillStyle = entity.color;
+                ctx.fillRect(...this.worldObjToScreenObj(entity));
+            } 
+            
+        }
+
         ctx.fillStyle = colors.player;
 
         ctx.fillRect(...this.worldObjToScreenObj(player));
@@ -651,6 +664,9 @@ function update(){
     particleManager.update(deltaTime);
     player.update(deltaTime);
     levelManager.update(deltaTime);
+    for(let i in entities){
+        entities[i].update(deltaTime);
+    }
 
     window.requestAnimationFrame(update);
 
@@ -705,6 +721,9 @@ levelManager.levels.push(new Level([], sampleLevelPlatforms, [40, 25], [[-10, -1
 
 levelManager.levels.push(new Level([], [new Platform([15, 15], [10, 1]), new Platform([70, 30], [3, 1])], [18, 12], [[-10, -10], [2 * tilesVisibleVertically + 20, tilesVisibleVertically + 100]], 'backgroundPiano', [samplePosEvent3, samplePosEvent4, samplePosEvent5], [sampleDoor2]));
 
-let sampleEnemy0 = new BasicEnemy([10, 10], 1, 5, true);
+let sampleEnemy0 = new BasicEnemy([16, 24], 1, 5, true);
 
 start();
+
+//code to be called after level loads.
+setTimeout(_=>{entities.push(sampleEnemy0)}, 30);
