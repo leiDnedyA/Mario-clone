@@ -2,8 +2,15 @@
 const canvas = document.querySelector('#editorCanvas');
 const ctx = canvas.getContext('2d');
 
+const zoomRestrictions = {
+    maximum: 300,
+    minimum: 20,
+}
+
 var zoomScale = 50;
 var cameraOffset = [0, 0]
+
+const getZoomVelocity = _=>(zoomScale / 5);
 
 var tileSize = window.innerHeight / zoomScale;
 
@@ -15,9 +22,14 @@ window.addEventListener('resize', _=>{
     resizeOrZoom();
 })
 window.addEventListener('wheel', (e)=>{
-    let deltaY = Math.sign(e.deltaY);
-    console.log(deltaY);
-    zoomScale += deltaY;
+    let deltaY = Math.sign(e.deltaY) * getZoomVelocity();
+    
+    let potentialZoom = zoomScale + deltaY;
+
+    if(potentialZoom >= zoomRestrictions.minimum && potentialZoom <= zoomRestrictions.maximum){
+        zoomScale = potentialZoom;
+    }
+
     resizeOrZoom();
 })
 
