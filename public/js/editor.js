@@ -28,6 +28,13 @@ const renderer = {
 
 const levelLoader = {
 
+    levels: [],
+
+    loadLevel: function(level){
+
+    },
+
+
 }
 
 function start(){
@@ -39,5 +46,9 @@ function update(){
     renderer.draw();
     window.requestAnimationFrame(update);
 }
+
+
+
+
 
 start();

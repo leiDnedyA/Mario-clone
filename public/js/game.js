@@ -54,62 +54,6 @@ window.addEventListener('contextmenu',e=>{e.preventDefault()});
 window.addEventListener('resize', e=>{canvas.width = window.innerWidth; canvas.height = window.innerHeight; tileSize = canvas.height / tilesVisibleVertically;});
 
 
-// class used to store position-based events within levels e.g player walks over a tile and text appears
-class PositionEvent {
-
-    /**
-     * Creates PositionEvent instance.
-     * 
-     * @param {[x, y]} position position that event occurs at
-     * @param {PositionEvent~posEventCallback} callback function that executes when event is triggered
-     * @param {[x, y]} range range within which the event can be triggered
-     * @param {boolean} isRepeatable whether or not the event is a one-time thing or repeats
-     * @param {number} repeatDelay millisecond delay between repeats if applicable
-     */
-    constructor(position = [0, 0], callback, range = [5, 5], isRepeatable = true, repeatDelay = 5000){
-        this.position = position;
-        this.callback = callback;
-        this.range = range;
-        this.isRepeatable = isRepeatable;
-        this.repeatDelay = repeatDelay;
-        this.lastExecution = 0;
-        this.hasExecuted = false;
-    }
-
-    /**
-     * Tests conditions for event and executes if conditions are met.
-     * 
-     * @param {[x, y]} playerPosition current position of player
-     */
-    tryExecution(playerPosition){
-        if((this.isRepeatable && Date.now() - this.lastExecution >= this.repeatDelay) || (!this.isRepeatable && !this.hasExecuted)){
-            let xPosCheck = playerPosition[0] >= this.position[0] - this.range[0] && playerPosition[0] <= this.position[0] + this.range[0];
-            let yPosCheck = playerPosition[1] >= this.position[1] - this.range[1] && playerPosition[1] <= this.position[1] + this.range[1];
-            if(xPosCheck && yPosCheck){
-                this.execute(playerPosition);
-            }
-        }
-    }
-
-    /**
-     * Executes callback function for event.
-     * 
-     * @param {[x, y]} playerPosition current position of player
-     */
-    execute(playerPosition){
-        this.callback(playerPosition);
-        this.hasExecuted = true;
-        this.lastExecution = Date.now();
-    }
-}
-/**
- * Callback function used in PositionEvent class.
- * @callback PositionEvent~posEventCallback
- * @param {[x, y]} playerPosition current position of player.
- */
-
-
-
 class Player extends Entity {
     constructor(position){
         super(position, 50);
@@ -660,28 +604,11 @@ const musicLibrary = [
 ];
 audioManager.loadLibrary(musicLibrary);
 
-let sampleLevelPlatforms = [];
+let sampleLevels = generateLevels(tilesVisibleVertically);
 
-sampleLevelPlatforms.push(new Platform([10, 11], [25, 1]));
-sampleLevelPlatforms.push(new Platform([15, 6], [25, 1]));
-sampleLevelPlatforms.push(new Platform([20, 3], [25, 1]));
-sampleLevelPlatforms.push(new Platform([40, 15], [4, 1]));
-sampleLevelPlatforms.push(new Platform([15, 25], [4, 1]));
-sampleLevelPlatforms.push(new Platform([15, 6], [25, 1]));
-sampleLevelPlatforms.push(new Platform([30, 30], [25, 1]));
+levelManager.levels.push(sampleLevels[0]);
 
-let samplePosEvent = new PositionEvent([40, 25], (playerPosition) => {textManager.createText('Use "A", "D", and Space to move', [...playerPosition])}, [5, 5], true, 1000);
-let samplePosEvent2 = new PositionEvent([32, -3], (playerPosition) => { textManager.createText('Press "W" to enter the door!', [...playerPosition])}, [10, 6], true, 1000);
-let samplePosEvent3 = new PositionEvent([18, 14], (playerPosition) => { textManager.createText('Ty for testing my game <3', [...playerPosition]) }, [10, 6], true, 1000);
-let samplePosEvent4 = new PositionEvent([70, 30], (playerPosition)=>{textManager.createText('Woah good job :O', [...playerPosition])}, [5, 5], true, 1000);
-let samplePosEvent5 = new PositionEvent([80, 39], (playerPosition) => { textManager.createText('jk >:D', [...playerPosition]) }, [20, 6], true, 1000);
-
-let sampleDoor = new Door([34, 1], [1, 2], 1, [18, 10]);
-let sampleDoor2 = new Door([16, 13], [1, 2], 0, [34, -1]);
-
-levelManager.levels.push(new Level([], sampleLevelPlatforms, [40, 25], [[-10, -10], [2 * tilesVisibleVertically + 20, tilesVisibleVertically + 100]], 'backgroundPiano', [samplePosEvent, samplePosEvent2], [sampleDoor]));
-
-levelManager.levels.push(new Level([], [new Platform([15, 15], [10, 1]), new Platform([70, 30], [3, 1])], [18, 12], [[-10, -10], [2 * tilesVisibleVertically + 20, tilesVisibleVertically + 100]], 'backgroundPiano', [samplePosEvent3, samplePosEvent4, samplePosEvent5], [sampleDoor2]));
+levelManager.levels.push(sampleLevels[1]);
 
 // let sampleEnemy0 = new BasicEnemy([16, 24], 1, 1, true);
 
