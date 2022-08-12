@@ -722,9 +722,9 @@ levelManager.levels.push(new Level([], sampleLevelPlatforms, [40, 25], [[-10, -1
 
 levelManager.levels.push(new Level([], [new Platform([15, 15], [10, 1]), new Platform([70, 30], [3, 1])], [18, 12], [[-10, -10], [2 * tilesVisibleVertically + 20, tilesVisibleVertically + 100]], 'backgroundPiano', [samplePosEvent3, samplePosEvent4, samplePosEvent5], [sampleDoor2]));
 
-let sampleEnemy0 = new BasicEnemy([16, 24], 1, 1, true);
+// let sampleEnemy0 = new BasicEnemy([16, 24], 1, 1, true);
 
 start();
 
 //code to be called after level loads.
-setTimeout(_=>{entities.push(sampleEnemy0)}, 30);
+// setTimeout(_=>{entities.push(sampleEnemy0)}, 30);
