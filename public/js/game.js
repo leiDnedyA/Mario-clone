@@ -77,22 +77,6 @@ class Level {
     }
 }
 
-class Platform {
-    constructor(position = [0, 0], dimensions = [0, 0]){
-        this.position = position;
-        this.dimensions = dimensions;
-    }
-}
-
-class Door {
-    constructor(position = [0, 0], dimensions = [1, 1], destinationLevelIndex = 0, exitPosition = [10, 10]){
-        this.position = position;
-        this.dimensions = dimensions;
-        this.destinationLevelIndex = destinationLevelIndex;
-        this.exitPosition = exitPosition;
-    }
-}
-
 // class used to store position-based events within levels e.g player walks over a tile and text appears
 class PositionEvent {
 

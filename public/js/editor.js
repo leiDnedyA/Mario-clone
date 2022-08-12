@@ -6,6 +6,9 @@ var zoomScale = 30;
 
 var tileSize = window.innerHeight / zoomScale;
 
+var loadedPlatforms = [];
+var loadedEntities = [];
+
 window.addEventListener('resize', _=>{
     resizeOrZoom();
 })
@@ -18,11 +21,23 @@ function resizeOrZoom(){
 
 const renderer = {
     draw: function(){
-
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 }
 
 const levelLoader = {
-    
+
 }
 
+function start(){
+    resizeOrZoom();
+    window.requestAnimationFrame(update);
+}
+
+function update(){
+    renderer.draw();
+    window.requestAnimationFrame(update);
+}
+
+start();
