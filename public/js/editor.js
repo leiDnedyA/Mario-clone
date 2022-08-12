@@ -7,6 +7,22 @@ const zoomRestrictions = {
     minimum: 20,
 }
 
+const cameraRestrictions = {
+    x: {
+        minimum: -20,
+        maximum: 100,
+    },
+    y: {
+        minimum: -20,
+        maximum: 100
+    }, 
+}
+
+const mouseData = {
+    isDown: false,
+    lastDownPos: [0, 0],
+}
+
 var zoomScale = 50;
 var cameraOffset = [0, 0]
 
@@ -33,6 +49,22 @@ window.addEventListener('wheel', (e)=>{
     resizeOrZoom();
 })
 
+window.addEventListener('mousedown', e=>{
+    mouseData.isDown = true;
+    mouseData.lastDownPos = [e.offsetX, e.offsetY];
+})
+
+window.addEventListener('mouseup', e=>{
+    mouseData.isDown = false;
+})
+
+window.addEventListener('mousemove', e=>{
+    if(mouseData.isDown){
+        cameraOffset[0] += e.movementX / tileSize;
+        cameraOffset[1] += e.movementY / tileSize;
+    }
+})
+
 function resizeOrZoom(){
     tileSize = window.innerHeight / zoomScale;
     canvas.width = window.innerWidth;
@@ -44,7 +76,7 @@ const renderer = {
     worldPosToScreenPos: pos => [pos[0] * tileSize, pos[1] * tileSize],
 
     worldObjToScreenObj: obj => {
-        return [(obj.position[0] + cameraOffset[0]) * tileSize, (obj.position[1] + cameraOffset[1]) * tileSize, (obj.dimensions[0] + cameraOffset[0]) * tileSize, (obj.dimensions[1] + cameraOffset[1]) * tileSize];
+        return [(obj.position[0] + cameraOffset[0]) * tileSize, (obj.position[1] + cameraOffset[1]) * tileSize, (obj.dimensions[0]) * tileSize, (obj.dimensions[1]) * tileSize];
     },
 
 
