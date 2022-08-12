@@ -34,19 +34,31 @@ var loadedPlatforms = [];
 var loadedEntities = [];
 var loadedDoors = [];
 
+const screenPosToWorldPos = pos=>([(pos[0] / tileSize) - cameraOffset[0], (pos[1] / tileSize) - cameraOffset[1]])
+
 window.addEventListener('resize', _=>{
     resizeOrZoom();
 })
 window.addEventListener('wheel', (e)=>{
+
+    let mouseWorldPos0 = screenPosToWorldPos([e.clientX, e.clientY]);
+
     let deltaY = Math.sign(e.deltaY) * getZoomVelocity();
     
     let potentialZoom = zoomScale + deltaY;
 
     if(potentialZoom >= zoomRestrictions.minimum && potentialZoom <= zoomRestrictions.maximum){
         zoomScale = potentialZoom;
+
+        resizeOrZoom();
+
+        let mouseWorldPos1 = screenPosToWorldPos([e.clientX, e.clientY]);
+        for(let i in cameraOffset){
+            cameraOffset[i] -= mouseWorldPos0[i] - mouseWorldPos1[i];
+        }
+        resizeOrZoom();
     }
 
-    resizeOrZoom();
 })
 
 window.addEventListener('mousedown', e=>{
