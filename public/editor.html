@@ -6,10 +6,36 @@
                 padding: 0;
                 border: 0;
             }
+            #menu {
+                position: absolute;
+                left: 5px;
+                top: 5px;
+                z-index: 9;
+                background-color: rgba(0, 0, 10, .5);
+                color: #ffffff;
+                border: solid white 1px;
+            }
+            #menuHeader {
+                padding: 5px;
+                text-align: center;
+                background-color: rgba(50, 50, 70, .3);
+                cursor: move;
+            }
+            #menuContents{
+                color: rgba(200, 200, 200, .8);
+                padding: 10px;
+            }
         </style>
     </head>
     <body>
         <canvas id="editorCanvas"></canvas>
+        <div id="menu">
+            <div id="menuHeader"><h2>menu</h2></div>
+            <div id="menuContents">
+                <p>hello world</p>
+                <p>menu stuff goes here</p>
+            </div>
+        </div>
         <script src="./js/worldElements/platform.js"></script>
         <script src="./js/worldElements/door.js"></script>
         <script src="./js/level/level.js"></script>
