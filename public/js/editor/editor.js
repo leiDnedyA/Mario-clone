@@ -2,6 +2,11 @@
 const canvas = document.querySelector('#editorCanvas');
 const ctx = canvas.getContext('2d');
 
+const colors = {
+    selectedBorder: '#00ff00',
+    mouseOverBorder: '#ff0000'
+}
+
 const zoomRestrictions = {
     maximum: 300,
     minimum: 20,
@@ -103,6 +108,10 @@ window.addEventListener('wheel', (e)=>{
 window.addEventListener('mousedown', e=>{
     mouseData.isDown = true;
     mouseData.lastDownPos = [e.offsetX, e.offsetY];
+    if(mouseoverObjectData.type !== ''){
+        selectedObjectData.type = mouseoverObjectData.type + '';
+        selectedObjectData.index = parseInt(mouseoverObjectData.index)+0;
+    }
 })
 
 window.addEventListener('mouseup', e=>{
@@ -173,28 +182,36 @@ const renderer = {
             ctx.fillRect(...this.worldObjToScreenObj(platform));
         }
 
-        if(mouseoverObjectData.type !== ''){
-            let target = getGameObject(mouseoverObjectData.type, mouseoverObjectData.index);
+        let drawOutline = (target, color, alpha)=>{
             let rect = this.worldObjToScreenObj(target);
             let padding = 10;
-            for(let i in rect){
-                if(i<=1){
-                    rect[i]-=padding/2;
-                }else{
-                    rect[i]+=padding;
+            for (let i in rect) {
+                if (i <= 1) {
+                    rect[i] -= padding / 2;
+                } else {
+                    rect[i] += padding;
                 }
             }
-            ctx.strokeStyle = '#ff0000';
-            ctx.globalAlpha = .5;
+            ctx.strokeStyle = color;
+            ctx.globalAlpha = alpha;
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.rect(...rect);
             ctx.stroke();
             ctx.globalAlpha = 1;
-            
+
         }
 
+        let mouseoverIsSelected = (mouseoverObjectData.type === selectedObjectData.type) && (mouseoverObjectData.index === selectedObjectData.index);
 
+        if(mouseoverObjectData.type !== '' && !mouseoverIsSelected){
+            let target = getGameObject(mouseoverObjectData.type, mouseoverObjectData.index);
+            drawOutline(target, colors.mouseOverBorder, .5);
+        }
+        if(selectedObjectData.type !== ''){
+            console.log(selectedObjectData)
+            drawOutline(getGameObject(selectedObjectData.type, selectedObjectData.index), colors.selectedBorder, .5);
+        }
     }
 }
 
@@ -229,6 +246,10 @@ function update(){
     window.requestAnimationFrame(update);
 }
 
+
+function updateMenu(){
+    
+}
 
 let sampleLevels = generateLevels(tileSize);
 
