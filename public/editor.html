@@ -6,6 +6,9 @@
                 padding: 0;
                 border: 0;
             }
+            body {
+                overflow: hidden;
+            }
             #menu {
                 position: absolute;
                 left: 5px;
@@ -24,6 +27,26 @@
                 color: rgba(200, 200, 200, .8);
                 padding: 10px;
             }
+            #contextMenu {
+                position: fixed;
+                visibility: hidden;
+                left: 10px;
+                top: 10px;
+                z-index: 10000;
+                background: #1b1a1a;
+                width: 150px;
+                border-radius: 5px;
+            }
+            #contextMenu .item {
+                padding: 8px 10px;
+                font-size: 15px;
+                color: #eee;
+                cursor: pointer;
+                border-radius: inherit;
+            }
+            #contextMenu .item:hover {
+                background: #323434;
+            }
         </style>
     </head>
     <body>
@@ -34,6 +57,13 @@
                 
             </div>
         </div>
+        <div id="contextMenu">
+            <div class="item">Option 1</div>
+            <div class="item">Option 2</div>
+            <div class="item">Option 3</div>
+            <div class="item">Option 4</div>
+        </div>
+        <script src="./js/editor/contextMenu.js"></script>
         <script src="./js/editor/menuManager.js"></script>
         <script src="./js/worldElements/platform.js"></script>
         <script src="./js/worldElements/door.js"></script>

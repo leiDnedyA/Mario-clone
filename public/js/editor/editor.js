@@ -83,6 +83,12 @@ const pointInObj = (point, obj)=>((point[0]>=obj.position[0]) && point[1]>=obj.p
 window.addEventListener('resize', _=>{
     resizeOrZoom();
 })
+
+window.addEventListener('contextmenu', (e)=>{
+    e.preventDefault();
+    contextMenu.show([e.offsetX, e.offsetY]);
+});
+
 window.addEventListener('wheel', (e)=>{
 
     let mouseWorldPos0 = screenPosToWorldPos([e.clientX, e.clientY]);
@@ -112,6 +118,7 @@ window.addEventListener('mousedown', e=>{
         selectedObjectData.type = mouseoverObjectData.type + '';
         selectedObjectData.index = parseInt(mouseoverObjectData.index)+0;
     }
+    if(!contextMenu.isHidden) contextMenu.hide();
 })
 
 window.addEventListener('mouseup', e=>{
