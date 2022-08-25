@@ -20,7 +20,7 @@ const cameraRestrictions = {
     y: {
         minimum: -20,
         maximum: 100
-    }, 
+    },
 }
 
 const mouseData = {
@@ -31,7 +31,7 @@ const mouseData = {
 var zoomScale = 50;
 var cameraOffset = [0, 0]
 
-const getZoomVelocity = _=>(zoomScale / 5);
+const getZoomVelocity = _ => (zoomScale / 5);
 
 var tileSize = window.innerHeight / zoomScale;
 
@@ -45,8 +45,8 @@ const gameObjects = {
     door: loadedDoors
 }
 
-const getGameObject = (type, index)=>{
-    switch(type){
+const getGameObject = (type, index) => {
+    switch (type) {
         case 'platform':
             return loadedPlatforms[index];
         case 'entity':
@@ -77,33 +77,33 @@ var mouseoverObjectData = {
     index: 0
 }
 
-const screenPosToWorldPos = pos=>([(pos[0] / tileSize) - cameraOffset[0], (pos[1] / tileSize) - cameraOffset[1]])
-const pointInObj = (point, obj)=>((point[0]>=obj.position[0]) && point[1]>=obj.position[1] && point[0]<= obj.position[0]+obj.dimensions[0] && point[1]<= obj.position[1]+ obj.dimensions[1]);
+const screenPosToWorldPos = pos => ([(pos[0] / tileSize) - cameraOffset[0], (pos[1] / tileSize) - cameraOffset[1]])
+const pointInObj = (point, obj) => ((point[0] >= obj.position[0]) && point[1] >= obj.position[1] && point[0] <= obj.position[0] + obj.dimensions[0] && point[1] <= obj.position[1] + obj.dimensions[1]);
 
-window.addEventListener('resize', _=>{
+window.addEventListener('resize', _ => {
     resizeOrZoom();
 })
 
-window.addEventListener('contextmenu', (e)=>{
+window.addEventListener('contextmenu', (e) => {
     e.preventDefault();
     contextMenu.show([e.offsetX, e.offsetY]);
 });
 
-window.addEventListener('wheel', (e)=>{
+window.addEventListener('wheel', (e) => {
 
     let mouseWorldPos0 = screenPosToWorldPos([e.clientX, e.clientY]);
 
     let deltaY = Math.sign(e.deltaY) * getZoomVelocity();
-    
+
     let potentialZoom = zoomScale + deltaY;
 
-    if(potentialZoom >= zoomRestrictions.minimum && potentialZoom <= zoomRestrictions.maximum){
+    if (potentialZoom >= zoomRestrictions.minimum && potentialZoom <= zoomRestrictions.maximum) {
         zoomScale = potentialZoom;
 
         resizeOrZoom();
 
         let mouseWorldPos1 = screenPosToWorldPos([e.clientX, e.clientY]);
-        for(let i in cameraOffset){
+        for (let i in cameraOffset) {
             cameraOffset[i] -= mouseWorldPos0[i] - mouseWorldPos1[i];
         }
         resizeOrZoom();
@@ -111,24 +111,29 @@ window.addEventListener('wheel', (e)=>{
 
 })
 
-window.addEventListener('mousedown', e=>{
-    mouseData.isDown = true;
-    mouseData.lastDownPos = [e.offsetX, e.offsetY];
-    if(mouseoverObjectData.type !== ''){
-        selectedObjectData.type = mouseoverObjectData.type + '';
-        selectedObjectData.index = parseInt(mouseoverObjectData.index)+0;
+window.addEventListener('mousedown', e => {
+    if (e.button === 0) {
+        mouseData.isDown = true;
+        mouseData.lastDownPos = [e.offsetX, e.offsetY];
     }
-    if(!contextMenu.isHidden) contextMenu.hide();
+    if (!contextMenu.isHidden) contextMenu.hide();
 })
 
-window.addEventListener('mouseup', e=>{
+window.addEventListener('mouseup', e => {
+    if (mouseoverObjectData.type == '') {
+        selectedObjectData.type = '';
+        selectedObjectData.index = 0;
+    } else {
+        selectedObjectData.type = mouseoverObjectData.type + '';
+        selectedObjectData.index = parseInt(mouseoverObjectData.index) + 0;
+    }
     mouseData.isDown = false;
 })
 
-window.addEventListener('mousemove', e=>{
-    
+window.addEventListener('mousemove', e => {
+
     //mouse dragging navigation
-    if(mouseData.isDown){
+    if (mouseData.isDown) {
         cameraOffset[0] += e.movementX / tileSize;
         cameraOffset[1] += e.movementY / tileSize;
     }
@@ -137,7 +142,7 @@ window.addEventListener('mousemove', e=>{
     let mouseWorldPos = screenPosToWorldPos([e.clientX, e.clientY]);
     let triggered = false;
 
-    let checkMOObject = (type, index)=>{
+    let checkMOObject = (type, index) => {
         let obj = getGameObject(type, index);
         if (pointInObj(mouseWorldPos, obj)) {
             triggered = true;
@@ -146,25 +151,25 @@ window.addEventListener('mousemove', e=>{
         }
     }
 
-    for(let i in loadedPlatforms){
+    for (let i in loadedPlatforms) {
         checkMOObject('platform', i);
     }
-    for(let i in loadedEntities){
-        if(triggered) break;
+    for (let i in loadedEntities) {
+        if (triggered) break;
         checkMOObject('entity', i);
     }
-    for(let i in loadedDoors){
-        if(triggered) break;
+    for (let i in loadedDoors) {
+        if (triggered) break;
         checkMOObject('door', i);
     }
 
-    if(!triggered){
+    if (!triggered) {
         mouseoverObjectData.type = '';
         mouseoverObjectData.index = 0;
     }
 })
 
-function resizeOrZoom(){
+function resizeOrZoom() {
     tileSize = window.innerHeight / zoomScale;
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -179,17 +184,17 @@ const renderer = {
     },
 
 
-    draw: function(){
+    draw: function () {
         ctx.fillStyle = 'black';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         ctx.fillStyle = 'white';
-        for(let i in loadedPlatforms){
+        for (let i in loadedPlatforms) {
             let platform = loadedPlatforms[i];
             ctx.fillRect(...this.worldObjToScreenObj(platform));
         }
 
-        let drawOutline = (target, color, alpha)=>{
+        let drawOutline = (target, color, alpha) => {
             let rect = this.worldObjToScreenObj(target);
             let padding = 10;
             for (let i in rect) {
@@ -211,11 +216,11 @@ const renderer = {
 
         let mouseoverIsSelected = (mouseoverObjectData.type === selectedObjectData.type) && (mouseoverObjectData.index === selectedObjectData.index);
 
-        if(mouseoverObjectData.type !== '' && !mouseoverIsSelected){
+        if (mouseoverObjectData.type !== '' && !mouseoverIsSelected) {
             let target = getGameObject(mouseoverObjectData.type, mouseoverObjectData.index);
             drawOutline(target, colors.mouseOverBorder, .5);
         }
-        if(selectedObjectData.type !== ''){
+        if (selectedObjectData.type !== '') {
             console.log(selectedObjectData)
             drawOutline(getGameObject(selectedObjectData.type, selectedObjectData.index), colors.selectedBorder, .5);
         }
@@ -228,8 +233,8 @@ const levelLoader = {
 
     currentLevelIndex: 0,
 
-    loadLevel: function(index){
-        if(index < this.levels.length){
+    loadLevel: function (index) {
+        if (index < this.levels.length) {
             let currentLevel = this.levels[index];
             this.currentLevelIndex = index;
 
@@ -243,19 +248,19 @@ const levelLoader = {
 
 }
 
-function start(){
+function start() {
     resizeOrZoom();
     window.requestAnimationFrame(update);
 }
 
-function update(){
+function update() {
     renderer.draw();
     window.requestAnimationFrame(update);
 }
 
 
-function updateMenu(){
-    
+function updateMenu() {
+
 }
 
 let sampleLevels = generateLevels(tileSize);
