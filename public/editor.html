@@ -47,6 +47,12 @@
             #contextMenu .item:hover {
                 background: #323434;
             }
+            #contextMenu .item.disabled {
+                color: #777;
+            }
+            #contextMenu .item.disabled:hover {
+                background: inherit;
+            }
         </style>
     </head>
     <body>
@@ -59,7 +65,7 @@
         </div>
         <div id="contextMenu">
             <div class="item">Option 1</div>
-            <div class="item">Option 2</div>
+            <div class="item disabled">Option 2</div>
             <div class="item">Option 3</div>
             <div class="item">Option 4</div>
         </div>
