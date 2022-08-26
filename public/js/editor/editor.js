@@ -116,18 +116,20 @@ window.addEventListener('mousedown', e => {
         mouseData.isDown = true;
         mouseData.lastDownPos = [e.offsetX, e.offsetY];
     }
-    if (!contextMenu.isHidden) contextMenu.hide();
 })
 
 window.addEventListener('mouseup', e => {
-    if (mouseoverObjectData.type == '') {
-        selectedObjectData.type = '';
-        selectedObjectData.index = 0;
-    } else {
-        selectedObjectData.type = mouseoverObjectData.type + '';
-        selectedObjectData.index = parseInt(mouseoverObjectData.index) + 0;
+    if(e.target.id === 'editorCanvas'){
+        if (mouseoverObjectData.type == '') {
+            selectedObjectData.type = '';
+            selectedObjectData.index = 0;
+        } else {
+            selectedObjectData.type = mouseoverObjectData.type + '';
+            selectedObjectData.index = parseInt(mouseoverObjectData.index) + 0;
+        }
     }
     mouseData.isDown = false;
+    if (!contextMenu.isHidden) contextMenu.hide();
 })
 
 window.addEventListener('mousemove', e => {
@@ -221,7 +223,6 @@ const renderer = {
             drawOutline(target, colors.mouseOverBorder, .5);
         }
         if (selectedObjectData.type !== '') {
-            console.log(selectedObjectData)
             drawOutline(getGameObject(selectedObjectData.type, selectedObjectData.index), colors.selectedBorder, .5);
         }
     }
