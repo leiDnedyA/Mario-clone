@@ -1,8 +1,17 @@
 
+/**
+ * This callback tests whether the target gameObject is valid and returns a boolean expressing the outcome.
+ * @callback ContextButton~conditionalCallback
+ * @param targetData type and index of target gameObject
+ * @param {string} targetData.type which type of object the target is
+ * @param {number} targetData.index index of target in respective list
+ * @returns {boolean} whether ot not button should be enabled based on the current target
+ */
+
 class ContextButton {
     /**
      * 
-     * @param {string} label 
+     * @param {string} label label of button
      * @param {*} conditionCallback returns false if button should be disabled and true if enabled.
      * @param {*} callback 
      */
@@ -40,7 +49,7 @@ class ContextButton {
         }
     }
 
-    loadTarget(targetData) {
+    loadTargetData(targetData) {
         this.targetData = targetData;
         this.setDisabled(!this.conditionCallback(this.targetData));
     }
@@ -65,7 +74,7 @@ const contextMenu = {
         this.currentTargetData = targetData;
 
         for(let i in this.buttons){
-            this.buttons[i].loadTarget(this.currentTargetData);
+            this.buttons[i].loadTargetData(this.currentTargetData);
         }
         
         this.domElement.style.visibility = "visible";
