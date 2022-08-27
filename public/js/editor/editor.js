@@ -58,6 +58,20 @@ const getGameObject = (type, index) => {
     }
 }
 
+const deleteGameObject = (type, index) =>{ //REMINDER: this will only delete objects from the current view
+
+    switch (type) {
+        case 'platform':
+            return loadedPlatforms.splice(index, 1);
+        case 'entity':
+            return loadedEntities.splice(index, 1);
+        case 'door':
+            return loadedDoors.splice(index, 1);
+        default:
+            return null;
+    }
+}
+
 /**
  * selectedObjectData and mouseoverObjectData contain info about which game objects
  * are currently selected/moused over.
@@ -264,11 +278,39 @@ function updateMenu() {
 
 }
 
+//level loading init VVVV
+
 let sampleLevels = generateLevels(tileSize);
 
 levelLoader.levels.push(sampleLevels[0]);
 levelLoader.levels.push(sampleLevels[1]);
 
 levelLoader.loadLevel(0);
+
+//context menu init VVVV
+
+const ctxButtonList = [];
+
+const ctxBtnConditionals = { //stores repeat conditional functions
+    anyObject: targetData=>(targetData.type!==''),
+};
+
+ctxButtonList.push(new ContextButton("Test", ctxBtnConditionals.anyObject, targetData=>{
+    console.log(targetData)
+}));
+
+ctxButtonList.push(new ContextButton("Delete", ctxBtnConditionals.anyObject, targetData=>{
+    //REMINDER: this will only delete objects from the current view
+    deleteGameObject(targetData.type, targetData.index);
+    selectedObjectData.type = '';
+    selectedObjectData.index = 0;
+    selectedObjectData.isSelected = false;
+
+
+}))
+
+contextMenu.init(ctxButtonList);
+
+
 
 start();

@@ -87,13 +87,3 @@ const contextMenu = {
     }
 
 }
-
-const ctxButtonList = [];
-
-ctxButtonList.push(new ContextButton("Test", targetData=>{
-    return targetData.type!=='';
-}, targetData=>{
-    console.log(targetData)
-}));
-
-contextMenu.init(ctxButtonList);
