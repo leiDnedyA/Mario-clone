@@ -86,7 +86,7 @@ window.addEventListener('resize', _ => {
 
 window.addEventListener('contextmenu', (e) => {
     e.preventDefault();
-    contextMenu.show([e.offsetX, e.offsetY]);
+    contextMenu.show([e.offsetX, e.offsetY], selectedObjectData);
 });
 
 window.addEventListener('wheel', (e) => {

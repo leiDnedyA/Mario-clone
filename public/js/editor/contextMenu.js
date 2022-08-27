@@ -48,7 +48,7 @@ class ContextButton {
 
 }
 
-//planned buttons: Delete, Copy, Paste, Expand, etc...
+//planned buttons: Edit, Delete, Copy, Paste
 
 const contextMenu = {
 
@@ -58,7 +58,16 @@ const contextMenu = {
 
     buttons: [],
 
+    currentTargetData: {},
+
     show: function (position, targetData) {
+
+        this.currentTargetData = targetData;
+
+        for(let i in this.buttons){
+            this.buttons[i].loadTarget(this.currentTargetData);
+        }
+        
         this.domElement.style.visibility = "visible";
         this.domElement.style.left = `${position[0]}px`;
         this.domElement.style.top = `${position[1]}px`;
@@ -72,8 +81,19 @@ const contextMenu = {
 
     init: function (buttons = []) {
         this.buttons = buttons;
+        for(let i in this.buttons){
+            this.domElement.appendChild(this.buttons[i].domElement);
+        }
     }
 
 }
 
-contextMenu.init();
+const ctxButtonList = [];
+
+ctxButtonList.push(new ContextButton("Test", targetData=>{
+    return targetData.type!=='';
+}, targetData=>{
+    console.log(targetData)
+}));
+
+contextMenu.init(ctxButtonList);
