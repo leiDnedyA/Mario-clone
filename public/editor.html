@@ -1,76 +1,96 @@
 <html>
-    <head>
-        <style>
-            * {
-                margin: 0;
-                padding: 0;
-                border: 0;
-            }
-            body {
-                overflow: hidden;
-            }
-            #menu {
-                position: absolute;
-                left: 5px;
-                top: 5px;
-                z-index: 9;
-                background-color: rgba(0, 0, 10, .5);
-                color: #ffffff;
-                border: solid white 1px;
-            }
-            #menuHeader {
-                padding: 5px;
-                text-align: center;
-                background-color: rgba(50, 50, 70, .3);
-            }
-            #menuContents{
-                color: rgba(200, 200, 200, .8);
-                padding: 10px;
-            }
-            #contextMenu {
-                position: fixed;
-                visibility: hidden;
-                left: 10px;
-                top: 10px;
-                z-index: 10000;
-                background: #1b1a1a;
-                width: 150px;
-                border-radius: 5px;
-            }
-            #contextMenu .item {
-                padding: 8px 10px;
-                font-size: 15px;
-                color: #eee;
-                cursor: pointer;
-                border-radius: inherit;
-            }
-            #contextMenu .item:hover {
-                background: #323434;
-            }
-            #contextMenu .item.disabled {
-                color: #777;
-            }
-            #contextMenu .item.disabled:hover {
-                background: inherit;
-            }
-        </style>
-    </head>
-    <body>
-        <canvas id="editorCanvas"></canvas>
-        <div id="menu">
-            <div id="menuHeader"><h2>menu</h2></div>
-            <div id="menuContents">
-                
-            </div>
+
+<head>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            border: 0;
+        }
+
+        body {
+            overflow: hidden;
+        }
+
+        #menu {
+            position: absolute;
+            display: inline-block;
+            width: 200px;
+            left: 5px;
+            top: 5px;
+            z-index: 9;
+            background-color: rgba(0, 0, 10, .5);
+            color: #ffffff;
+            border: solid white 1px;
+        }
+
+        #menuHeader {
+            padding: 5px;
+            text-align: center;
+            background-color: rgba(50, 50, 70, .3);
+        }
+
+        #menuContents {
+            color: rgba(200, 200, 200, .8);
+            padding: 10px;
+        }
+
+        #contextMenu {
+            position: fixed;
+            visibility: hidden;
+            left: 10px;
+            top: 10px;
+            z-index: 10000;
+            background: #1b1a1a;
+            width: 150px;
+            border-radius: 5px;
+        }
+
+        #contextMenu .item {
+            padding: 8px 10px;
+            font-size: 15px;
+            color: #eee;
+            cursor: pointer;
+            border-radius: inherit;
+        }
+
+        #contextMenu .item:hover {
+            background: #323434;
+        }
+
+        #contextMenu .item.disabled {
+            color: #777;
+        }
+
+        #contextMenu .item.disabled:hover {
+            background: inherit;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="editorCanvas"></canvas>
+    <div id="menu">
+        <div id="menuHeader">
+            <h2>menu</h2>
         </div>
-        <div id="contextMenu"></div>
-        <script src="./js/editor/contextMenu.js"></script>
-        <script src="./js/editor/menuManager.js"></script>
-        <script src="./js/worldElements/platform.js"></script>
-        <script src="./js/worldElements/door.js"></script>
-        <script src="./js/level/level.js"></script>
-        <script src="./js/events/positionEvent.js"></script>
-        <script src="./js/sampleObjects.js"></script>
-        <script src="./js/editor/editor.js"></script>
-    </body>
+        <div id="menuContents">
+            <label for="level">Upload level file:</label>
+            <input type="file" id="levelUploadInput" name="level" accept="text/json">
+            <button id="levelLoadButton">Load level JSON</button>
+            <button id="levelDownloadButton">Download level JSON</button>
+        </div>
+    </div>
+    <div id="contextMenu"></div>
+    <script src="./js/editor/contextMenu.js"></script>
+    <script src="./js/editor/menuManager.js"></script>
+    <script src="./js/worldElements/platform.js"></script>
+    <script src="./js/worldElements/door.js"></script>
+    <script src="./js/level/level.js"></script>
+    <script src="./js/events/positionEvent.js"></script>
+    <script src="./js/sampleObjects.js"></script>
+    <script src="./js/editor/editor.js"></script>
+    <script src="./js/editor/levelUpload.js"></script>
+</body>
+
 </html>

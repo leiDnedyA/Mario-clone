@@ -58,7 +58,7 @@ const getGameObject = (type, index) => {
     }
 }
 
-const deleteGameObject = (type, index) =>{ //REMINDER: this will only delete objects from the current view
+const deleteGameObject = (type, index) => { //REMINDER: this will only delete objects from the current view
 
     switch (type) {
         case 'platform':
@@ -84,11 +84,44 @@ var selectedObjectData = {
     type: '',
     index: 0,
     isSelected: false,
+    position: [0, 0],
+    clickPosition: [0, 0],
+    reset: function () {
+        this.type = '';
+        this.index = 0;
+        this.isSelected = false;
+        this.position = [0, 0];
+    },
+    getSelectedObj: function () {
+        return getGameObject(this.type, this.index);
+    },
+    getClickPosition: function () { return [this.clickPosition[0] * 1, this.clickPosition[1] * 1] },
+    setClickPos: function (clickPos) {
+        this.clickPosition = clickPos;
+    },
+    loadObject: function (type, index, clickPosition) {
+        this.type = type;
+        this.index = index;
+        this.clickPosition = clickPosition;
+        let pos = this.getSelectedObj().position;
+        this.position = [pos[0], pos[1]];
+    }
 }
 
 var mouseoverObjectData = {
     type: '',
     index: 0
+}
+
+//handles moving/resizing gameObjects via drag and drop
+var objectEditor = {
+    enabled: false,
+    resizeEnabled: false,
+    disableCamera: false,
+    isDragging: false,
+    handleMouseDown: _ => { },
+    handleMouseMove: _ => { },
+    handleMouseUp: _ => { },
 }
 
 const screenPosToWorldPos = pos => ([(pos[0] / tileSize) - cameraOffset[0], (pos[1] / tileSize) - cameraOffset[1]])
@@ -133,14 +166,14 @@ window.addEventListener('mousedown', e => {
 })
 
 window.addEventListener('mouseup', e => {
-    if(e.target.id === 'editorCanvas'){
+    if (e.target.id === 'editorCanvas') {
+        let clickWorldPos = screenPosToWorldPos([e.clientX, e.clientY]);
         if (mouseoverObjectData.type == '') {
-            selectedObjectData.type = '';
-            selectedObjectData.index = 0;
+            selectedObjectData.reset();
         } else {
-            selectedObjectData.type = mouseoverObjectData.type + '';
-            selectedObjectData.index = parseInt(mouseoverObjectData.index) + 0;
+            selectedObjectData.loadObject(mouseoverObjectData.type + '', parseInt(mouseoverObjectData.index) + 0);
         }
+        selectedObjectData.setClickPos(clickWorldPos);
     }
     mouseData.isDown = false;
     if (!contextMenu.isHidden) contextMenu.hide();
@@ -149,7 +182,7 @@ window.addEventListener('mouseup', e => {
 window.addEventListener('mousemove', e => {
 
     //mouse dragging navigation
-    if (mouseData.isDown) {
+    if (mouseData.isDown && !objectEditor.disableCamera) {
         cameraOffset[0] += e.movementX / tileSize;
         cameraOffset[1] += e.movementY / tileSize;
     }
@@ -248,7 +281,12 @@ const levelLoader = {
 
     currentLevelIndex: 0,
 
-    loadLevel: function (index) {
+    initiated: false,
+
+    getCurrentLevel: function(){return this.levels[this.currentLevelIndex]},
+
+    setCurrentLevel: function (index) {
+        this.initiated = true;
         if (index < this.levels.length) {
             let currentLevel = this.levels[index];
             this.currentLevelIndex = index;
@@ -259,6 +297,36 @@ const levelLoader = {
 
         }
     },
+
+    loadLevel: function (levelJSON){
+        let levelObj = JSON.parse(levelJSON);
+        console.log(levelObj);
+        this.levels.push(levelObj);
+        if(!this.initiated){this.setCurrentLevel(0)};
+        // let lvl = new Level();
+    },
+
+    updateLevel: function(){
+        this.levels[this.currentLevelIndex].entities = loadedEntities;
+        this.levels[this.currentLevelIndex].doors = loadedDoors;
+        this.levels[this.currentLevelIndex].platforms = loadedPlatforms;
+        console.log(this.getCurrentLevel())
+    },
+
+    exportLevel: function (title, fileName = "level") {
+        let currentLevel = this.getCurrentLevel();
+
+        let levelJSON = JSON.stringify(currentLevel);
+
+        let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(levelJSON);
+        let downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", fileName + ".json");
+        document.body.appendChild(downloadAnchorNode); // required for firefox
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+
+    }
 
 
 }
@@ -280,34 +348,35 @@ function updateMenu() {
 
 //level loading init VVVV
 
-let sampleLevels = generateLevels(tileSize);
 
-levelLoader.levels.push(sampleLevels[0]);
-levelLoader.levels.push(sampleLevels[1]);
-
-levelLoader.loadLevel(0);
+// levelLoader.setCurrentLevel(0);
 
 //context menu init VVVV
 
 const ctxButtonList = [];
 
 const ctxBtnConditionals = { //stores repeat conditional functions
-    anyObject: targetData=>(targetData.type!==''),
+    freeSpace: targetData => (targetData.type === ''),
+    anyObject: targetData => (targetData.type !== ''),
+    alwaysTrue: _ => true,
 };
 
-ctxButtonList.push(new ContextButton("Test", ctxBtnConditionals.anyObject, targetData=>{
+ctxButtonList.push(new ContextButton("Test", ctxBtnConditionals.anyObject, targetData => {
     console.log(targetData)
 }));
 
-ctxButtonList.push(new ContextButton("Delete", ctxBtnConditionals.anyObject, targetData=>{
+ctxButtonList.push(new ContextButton("Delete", ctxBtnConditionals.anyObject, targetData => {
     //REMINDER: this will only delete objects from the current view
     deleteGameObject(targetData.type, targetData.index);
-    selectedObjectData.type = '';
-    selectedObjectData.index = 0;
-    selectedObjectData.isSelected = false;
-
-
+    levelLoader.updateLevel();
+    selectedObjectData.reset();
 }))
+
+ctxButtonList.push(new ContextButton("Add platform", ctxBtnConditionals.freeSpace, targetData => {
+    loadedPlatforms.push(new Platform(selectedObjectData.getClickPosition(), [1, 1]));
+    levelLoader.updateLevel();
+}));
+
 
 contextMenu.init(ctxButtonList);
 
