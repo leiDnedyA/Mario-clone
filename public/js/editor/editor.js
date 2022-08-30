@@ -25,6 +25,7 @@ const cameraRestrictions = {
 
 const mouseData = {
     isDown: false,
+    target: null,
     lastDownPos: [0, 0],
 }
 
@@ -86,11 +87,26 @@ var selectedObjectData = {
     isSelected: false,
     position: [0, 0],
     clickPosition: [0, 0],
+    gui: new dat.GUI({name: 'Gameobject Properties'}),
+    guiElements: {},
     reset: function () {
         this.type = '';
         this.index = 0;
         this.isSelected = false;
         this.position = [0, 0];
+        this.guiReset();
+    },
+    guiReset: function(){
+        if(this.gui){
+            for(let i in this.guiElements){
+                if(this.guiElements[i] instanceof dat.controllers.Controller){
+                    this.gui.remove(this.guiElements[i]);
+                }else{
+                    this.gui.removeFolder(this.guiElements[i])
+                }
+                delete this.guiElements[i];
+            }
+        }
     },
     getSelectedObj: function () {
         return getGameObject(this.type, this.index);
@@ -100,11 +116,33 @@ var selectedObjectData = {
         this.clickPosition = clickPos;
     },
     loadObject: function (type, index, clickPosition) {
+        this.guiReset();
         this.type = type;
         this.index = index;
         this.clickPosition = clickPosition;
         let pos = this.getSelectedObj().position;
         this.position = [pos[0], pos[1]];
+        
+        let obj = this.getSelectedObj();
+
+        let ctrlObj = {
+            xPos: obj.position[0],
+            yPos: obj.position[1],
+            width: obj.dimensions[0],
+            height: obj.dimensions[1],
+        }
+
+
+        this.guiElements['position'] = this.gui.addFolder('Position');
+        this.guiElements['position'].open();
+        this.guiElements['position'].add(obj.position, 0, -100, 100);
+        this.guiElements['position'].add(obj.position, 1, -100, 100);
+
+        this.guiElements['dimensions'] = this.gui.addFolder('Dimensions');
+        this.guiElements['dimensions'].open();
+        this.guiElements['dimensions'].add(obj.dimensions, 0, 1, 50, 1);
+        this.guiElements['dimensions'].add(obj.dimensions, 1, 1, 50, 1);
+
     }
 }
 
@@ -162,6 +200,7 @@ window.addEventListener('mousedown', e => {
     if (e.button === 0) {
         mouseData.isDown = true;
         mouseData.lastDownPos = [e.offsetX, e.offsetY];
+        mouseData.target = e.target;
     }
 })
 
@@ -182,7 +221,7 @@ window.addEventListener('mouseup', e => {
 window.addEventListener('mousemove', e => {
 
     //mouse dragging navigation
-    if (mouseData.isDown && !objectEditor.disableCamera) {
+    if (mouseData.isDown && !objectEditor.disableCamera && mouseData.target == canvas) {
         cameraOffset[0] += e.movementX / tileSize;
         cameraOffset[1] += e.movementY / tileSize;
     }
@@ -385,15 +424,5 @@ ctxButtonList.push(new ContextButton("Add platform", ctxBtnConditionals.freeSpac
 
 contextMenu.init(ctxButtonList);
 
-//GUI STUFF
-
-const gui = new dat.GUI({name: 'Test GUI'});
-const testGUIObject = {
-    name: 'Sample name',
-    age: 69,
-    hobbies: ['murder', 'fishing', 'crypto']
-}
-gui.add(testGUIObject, 'name');
-gui.add(testGUIObject, 'age', 0, 100);
 
 start();
