@@ -348,6 +348,11 @@ function updateMenu() {
 
 //level loading init VVVV
 
+// let sampleLevelsOBJ = generateLevels(40);
+// let sampleLevelsList = [];
+// for(let i in sampleLevelsOBJ){sampleLevelsList.push(sampleLevelsOBJ[i])}
+
+// levelLoader.levels = sampleLevelsList;
 
 // levelLoader.setCurrentLevel(0);
 
