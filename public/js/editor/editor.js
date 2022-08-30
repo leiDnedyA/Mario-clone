@@ -385,6 +385,15 @@ ctxButtonList.push(new ContextButton("Add platform", ctxBtnConditionals.freeSpac
 
 contextMenu.init(ctxButtonList);
 
+//GUI STUFF
 
+const gui = new dat.GUI({name: 'Test GUI'});
+const testGUIObject = {
+    name: 'Sample name',
+    age: 69,
+    hobbies: ['murder', 'fishing', 'crypto']
+}
+gui.add(testGUIObject, 'name');
+gui.add(testGUIObject, 'age', 0, 100);
 
 start();
