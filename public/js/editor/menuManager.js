@@ -24,6 +24,7 @@ class MenuElement {
         this.buttonCallback = buttonCallback;
         
         this.domElement = document.createElement('div');
+        this.domElement.classList.add('menuLevelElement');
         
         let labelElement = document.createElement('p');
         labelElement.innerHTML = this.label + '';
@@ -31,7 +32,7 @@ class MenuElement {
         let buttonElement = document.createElement('button');
         buttonElement.innerHTML = 'select';
         buttonElement.addEventListener('click', this.buttonCallback);
-        
+        buttonElement.classList.add('coolButton');
         
         this.domElement.appendChild(labelElement);
         this.domElement.appendChild(buttonElement);

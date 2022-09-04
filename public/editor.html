@@ -39,6 +39,8 @@
             border: 1px solid white;
             margin: 3px;
             padding: 3px;
+            overflow-y: scroll;
+            height: 200px;
         }
 
         #contextMenu {
@@ -71,6 +73,21 @@
         #contextMenu .item.disabled:hover {
             background: inherit;
         }
+
+        .menuLevelElement {
+            padding: 5px;
+        }
+
+        .coolButton {
+            border-radius: 1px;
+            border: 0;
+            padding: 3px;
+        }
+
+        .coolButton:hover {
+            background-color: #aadddd;
+        }
+
     </style>
 </head>
 
@@ -84,8 +101,8 @@
             <div id="fileLoadingDiv">
                 <label for="level">Upload level file:</label>
                 <input type="file" id="levelUploadInput" name="level" accept="text/json">
-                <button id="levelLoadButton">Load level JSON</button>
-                <button id="levelDownloadButton">Download level JSON</button>
+                <button id="levelLoadButton" class="coolButton">Load level JSON</button>
+                <button id="levelDownloadButton" class="coolButton">Download level JSON</button>
             </div>
             <div id="levelElements">
 
