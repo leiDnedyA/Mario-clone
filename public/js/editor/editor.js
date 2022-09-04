@@ -56,7 +56,7 @@ const getGameObject = (type, index) => {
         case 'door':
             return loadedDoors[index];
         case 'boundsObj':
-            if(loadedBoundsObjs.hasOwnProperty(index)){
+            if (loadedBoundsObjs.hasOwnProperty(index)) {
                 return loadedBoundsObjs[index];
             }
             return null;
@@ -93,7 +93,7 @@ var selectedObjectData = {
     isSelected: false,
     position: [0, 0],
     clickPosition: [0, 0],
-    gui: new dat.GUI({name: 'Gameobject Properties'}),
+    gui: new dat.GUI({ name: 'Gameobject Properties' }),
     guiElements: {},
     reset: function () {
         this.type = '';
@@ -102,12 +102,12 @@ var selectedObjectData = {
         this.position = [0, 0];
         this.guiReset();
     },
-    guiReset: function(){
-        if(this.gui){
-            for(let i in this.guiElements){
-                if(this.guiElements[i] instanceof dat.controllers.Controller){
+    guiReset: function () {
+        if (this.gui) {
+            for (let i in this.guiElements) {
+                if (this.guiElements[i] instanceof dat.controllers.Controller) {
                     this.gui.remove(this.guiElements[i]);
-                }else{
+                } else {
                     this.gui.removeFolder(this.guiElements[i])
                 }
                 delete this.guiElements[i];
@@ -128,7 +128,7 @@ var selectedObjectData = {
         this.clickPosition = clickPosition;
         let pos = this.getSelectedObj().position;
         this.position = [pos[0], pos[1]];
-        
+
         let obj = this.getSelectedObj();
 
         let ctrlObj = {
@@ -328,7 +328,7 @@ const levelLoader = {
 
     initiated: false,
 
-    getCurrentLevel: function(){return this.levels[this.currentLevelIndex]},
+    getCurrentLevel: function () { return this.levels[this.currentLevelIndex] },
 
     setCurrentLevel: function (index) {
         this.initiated = true;
@@ -341,20 +341,27 @@ const levelLoader = {
             loadedDoors = [...currentLevel.doors];
             loadedBoundsObjs = {
                 startPos: new BoundsObject(currentLevel.playerStartPos, [1, 1], 'green'),
-                
             }
+
+            //menuManager setup
+
+            let playerStartPosElement = new MenuElement('Player Start Pos', loadedBoundsObjs.startPos, 'boundsObj', _=>{
+                selectedObjectData.loadObject('boundsObj', 'startPos', null);
+            })
+            menuManager.addElement(playerStartPosElement);
+
 
         }
     },
 
-    loadLevel: function (levelJSON){
+    loadLevel: function (levelJSON) {
         let levelObj = JSON.parse(levelJSON);
         console.log(levelObj);
         this.levels.push(levelObj);
-        if(!this.initiated){this.setCurrentLevel(0)};
+        if (!this.initiated) { this.setCurrentLevel(0) };
     },
 
-    updateLevel: function(){
+    updateLevel: function () {
         this.levels[this.currentLevelIndex].entities = loadedEntities;
         this.levels[this.currentLevelIndex].doors = loadedDoors;
         this.levels[this.currentLevelIndex].platforms = loadedPlatforms;
@@ -430,8 +437,6 @@ ctxButtonList.push(new ContextButton("Add platform", ctxBtnConditionals.freeSpac
     levelLoader.updateLevel();
 }));
 
-
 contextMenu.init(ctxButtonList);
-
 
 start();

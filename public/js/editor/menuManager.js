@@ -45,6 +45,6 @@ class MenuElement {
 }
 
 
-let testElement = new MenuElement('test element', {}, 'boundsObj', ()=>{alert('test element button pressed.')});;
+// let testElement = new MenuElement('test element', {}, 'boundsObj', ()=>{alert('test element button pressed.')});;
 
-menuManager.addElement(testElement)
+// menuManager.addElement(testElement)
