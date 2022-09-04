@@ -2,11 +2,6 @@
 const canvas = document.querySelector('#editorCanvas');
 const ctx = canvas.getContext('2d');
 
-const colors = {
-    selectedBorder: '#00ff00',
-    mouseOverBorder: '#ff0000'
-}
-
 const zoomRestrictions = {
     maximum: 300,
     minimum: 20,
@@ -146,8 +141,8 @@ var selectedObjectData = {
 
         this.guiElements['dimensions'] = this.gui.addFolder('Dimensions');
         this.guiElements['dimensions'].open();
-        this.guiElements['dimensions'].add(obj.dimensions, 0, 1, 50, 1);
-        this.guiElements['dimensions'].add(obj.dimensions, 1, 1, 50, 1);
+        this.guiElements['dimensions'].add(obj.dimensions, 0, 1, 300, 1).onChange(obj.update);
+        this.guiElements['dimensions'].add(obj.dimensions, 1, 1, 300, 1).onChange(obj.update);
 
     }
 }
@@ -288,6 +283,11 @@ const renderer = {
             ctx.fillRect(...this.worldObjToScreenObj(platform));
         }
 
+        for (let i in loadedDoors){
+            let door = loadedDoors[i];
+            ctx.drawImage(spriteImages.door, ...this.worldObjToScreenObj(door))
+        }
+
         let drawOutline = (target, color, alpha) => {
             let rect = this.worldObjToScreenObj(target);
             let padding = 10;
@@ -341,6 +341,7 @@ const levelLoader = {
             loadedDoors = [...currentLevel.doors];
             loadedBoundsObjs = {
                 startPos: new BoundsObject(currentLevel.playerStartPos, [1, 1], 'green'),
+                levelBounds: new WorldBoundsObject(currentLevel.boundingBox[0], currentLevel.boundingBox[1])
             }
 
             //menuManager setup
@@ -349,6 +350,11 @@ const levelLoader = {
                 selectedObjectData.loadObject('boundsObj', 'startPos', null);
             })
             menuManager.addElement(playerStartPosElement);
+
+            let levelBoundsElement = new MenuElement('Level Bounds', loadedBoundsObjs.startPos, 'boundsObj', _=>{
+                selectedObjectData.loadObject('boundsObj', 'levelBounds', null);
+            })
+            menuManager.addElement(levelBoundsElement);
 
 
         }
