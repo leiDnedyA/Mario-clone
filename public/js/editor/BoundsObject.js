@@ -34,6 +34,7 @@ class WorldBoundsObject extends BoundsObject{
     }
 
     update(){
+        super.update();
         this.topLeft = [...this.position];
         this.bottomRight = [this.position[0]+this.dimensions[0], this.position[1]+this.dimensions[1]];
     }
