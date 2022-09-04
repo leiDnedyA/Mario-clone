@@ -39,6 +39,7 @@ var tileSize = window.innerHeight / zoomScale;
 var loadedPlatforms = [];
 var loadedEntities = [];
 var loadedDoors = [];
+var loadedBoundsObjs = {};
 
 const gameObjects = {
     platform: loadedPlatforms,
@@ -54,6 +55,11 @@ const getGameObject = (type, index) => {
             return loadedEntities[index];
         case 'door':
             return loadedDoors[index];
+        case 'boundsObj':
+            if(loadedBoundsObjs.hasOwnProperty(index)){
+                return loadedBoundsObjs[index];
+            }
+            return null;
         default:
             return null;
     }
@@ -77,7 +83,7 @@ const deleteGameObject = (type, index) => { //REMINDER: this will only delete ob
  * selectedObjectData and mouseoverObjectData contain info about which game objects
  * are currently selected/moused over.
  * 
- * valid values of 'type' include 'platform', 'entity', and 'door'.
+ * valid values of 'type' include 'platform', 'entity', 'door', and 'boundsObj'.
  * 'index' refers to the index of the gameObject in its respective list e.g loadedPlatforms, loadedEntities, loadedDoors.
  * 
  */
@@ -333,6 +339,10 @@ const levelLoader = {
             loadedPlatforms = [...currentLevel.platforms];
             loadedEntities = [...currentLevel.entities];
             loadedDoors = [...currentLevel.doors];
+            loadedBoundsObjs = {
+                startPos: new BoundsObject(currentLevel.playerStartPos, [1, 1], 'green'),
+                
+            }
 
         }
     },
@@ -342,7 +352,6 @@ const levelLoader = {
         console.log(levelObj);
         this.levels.push(levelObj);
         if(!this.initiated){this.setCurrentLevel(0)};
-        // let lvl = new Level();
     },
 
     updateLevel: function(){

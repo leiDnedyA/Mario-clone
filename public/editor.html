@@ -35,6 +35,12 @@
             padding: 10px;
         }
 
+        #levelElements {
+            border: 1px solid white;
+            margin: 3px;
+            padding: 3px;
+        }
+
         #contextMenu {
             position: fixed;
             visibility: hidden;
@@ -75,16 +81,22 @@
             <h2>menu</h2>
         </div>
         <div id="menuContents">
-            <label for="level">Upload level file:</label>
-            <input type="file" id="levelUploadInput" name="level" accept="text/json">
-            <button id="levelLoadButton">Load level JSON</button>
-            <button id="levelDownloadButton">Download level JSON</button>
+            <div id="fileLoadingDiv">
+                <label for="level">Upload level file:</label>
+                <input type="file" id="levelUploadInput" name="level" accept="text/json">
+                <button id="levelLoadButton">Load level JSON</button>
+                <button id="levelDownloadButton">Download level JSON</button>
+            </div>
+            <div id="levelElements">
+
+            </div>
         </div>
     </div>
     <div id="contextMenu"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"></script>
     <script src="./js/editor/contextMenu.js"></script>
     <script src="./js/editor/menuManager.js"></script>
+    <script src="./js/editor/BoundsObject.js"></script>
     <script src="./js/worldElements/platform.js"></script>
     <script src="./js/worldElements/door.js"></script>
     <script src="./js/level/level.js"></script>
