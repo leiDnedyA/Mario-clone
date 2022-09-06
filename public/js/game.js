@@ -25,16 +25,16 @@ var userHasInteracted = false;
 
 
 
-window.addEventListener('click', _ => { userHasInteracted = true}, {once: true});
-window.addEventListener('keydown', _=>{ userHasInteracted = true}, {once: true});
+window.addEventListener('click', _ => { userHasInteracted = true }, { once: true });
+window.addEventListener('keydown', _ => { userHasInteracted = true }, { once: true });
 
-window.addEventListener('contextmenu',e=>{e.preventDefault()});
+window.addEventListener('contextmenu', e => { e.preventDefault() });
 
-window.addEventListener('resize', e=>{canvas.width = window.innerWidth; canvas.height = window.innerHeight; tileSize = canvas.height / tilesVisibleVertically;});
+window.addEventListener('resize', e => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; tileSize = canvas.height / tilesVisibleVertically; });
 
 
 class Player extends Entity {
-    constructor(position){
+    constructor(position) {
         super(position, 50);
 
         this.acceleration = 80;
@@ -48,7 +48,7 @@ class Player extends Entity {
 
     }
 
-    processInput(xAxisValue){
+    processInput(xAxisValue) {
 
         if (xAxisValue === 0) {
 
@@ -132,11 +132,11 @@ class Player extends Entity {
 
     }
 
-    doorRequest(){
-        for(let i in loadedDoors){
+    doorRequest() {
+        for (let i in loadedDoors) {
             let d = loadedDoors[i];
 
-            if(super.positionTest(this.position, d)){
+            if (super.positionTest(this.position, d)) {
                 levelManager.loadLevel(d.destinationLevelIndex);
                 this.position = [...d.exitPosition];
                 audioManager.playSoundEffect('door1');
@@ -153,10 +153,10 @@ class Player extends Entity {
         if (this.isGrounded) {
             //normal jump
             this.jump();
-        } else if (Date.now() - this.lastGroundTime <= this.lateJumpTimer && jumpDelay > 200){
+        } else if (Date.now() - this.lastGroundTime <= this.lateJumpTimer && jumpDelay > 200) {
             //late jump
             this.jump();
-        }else{
+        } else {
             //setup for early jump
             this.checkJumpRequest = true;
             this.lastJumpRequest = Date.now();
@@ -175,10 +175,10 @@ class Player extends Entity {
                 this.checkJumpRequest = false;
             }
         }
-        
+
         super.update(deltaTime);
 
-        if(!pointInBox(this.position, levelManager.getCurrentLevel().boundingBox)) this.die();
+        if (!pointInBox(this.position, levelManager.getCurrentLevel().boundingBox)) this.die();
 
     }
 }
@@ -193,15 +193,15 @@ const charController = {
 
     //keys that are being pressed but not held down
     eventKeys: {
-        "Space": ()=>{
+        "Space": () => {
             player.tryJump();
         },
-        "KeyW": ()=>{
+        "KeyW": () => {
             player.doorRequest();
         }
     },
 
-    changeKeyStatus : function(e){
+    changeKeyStatus: function (e) {
         let code = e.code;
 
         let isKeyDown = e.type === "keydown";
@@ -212,20 +212,20 @@ const charController = {
             }
         }
 
-        for(let i in this.keysDown){
-            if(i === code){
+        for (let i in this.keysDown) {
+            if (i === code) {
                 this.keysDown[code] = isKeyDown;
             }
         }
 
     },
 
-    init: function(){
-        window.addEventListener("keydown", e=>{this.changeKeyStatus(e)});
-        window.addEventListener("keyup", e=>(this.changeKeyStatus(e)));
+    init: function () {
+        window.addEventListener("keydown", e => { this.changeKeyStatus(e) });
+        window.addEventListener("keyup", e => (this.changeKeyStatus(e)));
     },
 
-    update : function(){
+    update: function () {
         let xAxisValue = ((this.keysDown.KeyD) ? 1 : 0) + ((this.keysDown.KeyA) ? -1 : 0);
 
         player.processInput(xAxisValue);
@@ -234,21 +234,21 @@ const charController = {
 };
 
 const renderer = {
-    
-    worldPosToScreenPos: pos=>[pos[0]*tileSize, pos[1]*tileSize],
 
-    worldObjToScreenObj: obj=>{
-        return [obj.position[0]*tileSize, obj.position[1]*tileSize, obj.dimensions[0]*tileSize, obj.dimensions[1]*tileSize];
+    worldPosToScreenPos: pos => [pos[0] * tileSize, pos[1] * tileSize],
+
+    worldObjToScreenObj: obj => {
+        return [obj.position[0] * tileSize, obj.position[1] * tileSize, obj.dimensions[0] * tileSize, obj.dimensions[1] * tileSize];
     },
 
-    draw: function(){
+    draw: function () {
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         ctx.fillStyle = colors.background;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        for(let i in textManager.currentTexts){
+        for (let i in textManager.currentTexts) {
             let t = textManager.currentTexts[i];
 
             ctx.fillStyle = t.color;
@@ -264,35 +264,35 @@ const renderer = {
 
         ctx.fillStyle = colors.platform;
 
-        for(let i in loadedPlatforms){
+        for (let i in loadedPlatforms) {
             ctx.fillRect(...this.worldObjToScreenObj(loadedPlatforms[i]));
         }
 
-        for(let i in loadedDoors){
+        for (let i in loadedDoors) {
             let screenObj = this.worldObjToScreenObj(loadedDoors[i]);
-            
+
             ctx.drawImage(spriteImages.door, ...screenObj);
 
         }
 
-        for(let i in entities){
+        for (let i in entities) {
             let entity = entities[i];
             let entityScreenObj = this.worldObjToScreenObj(entity);
             if (entity.hasOwnProperty('sprite')) {
                 ctx.drawImage(spriteImages[entity.sprite], ...entityScreenObj);
-            }else if(entity.hasOwnProperty('color')) {
+            } else if (entity.hasOwnProperty('color')) {
                 ctx.fillStyle = entity.color;
                 ctx.fillRect(...this.worldObjToScreenObj(entity));
-            } 
-            
+            }
+
         }
 
         ctx.fillStyle = colors.player;
 
         ctx.fillRect(...this.worldObjToScreenObj(player));
 
-        for(let i in particleManager.currentParticles){
-            
+        for (let i in particleManager.currentParticles) {
+
             let particle = particleManager.currentParticles[i];
             ctx.fillStyle = particle.color;
             ctx.globalAlpha = Math.abs(particle.opacity);
@@ -316,8 +316,8 @@ const levelManager = {
 
     levels: [],
 
-    loadLevel: function(index){
-        if(this.levels.length > index){
+    loadLevel: function (index) {
+        if (this.levels.length > index) {
 
             this.currentLevelIndex = index;
 
@@ -326,39 +326,39 @@ const levelManager = {
             loadedPlatforms = [];
             loadedDoors = [];
 
-            for(let i in level.platforms){
+            for (let i in level.platforms) {
                 loadedPlatforms.push(level.platforms[i]);
             }
 
-            for(let i in level.entities){
+            for (let i in level.entities) {
                 entities.push(level.entities[i]);
             }
 
-            for(let i in level.doors){
+            for (let i in level.doors) {
                 loadedDoors.push(level.doors[i]);
             }
 
-            if(level.backgroundMusic){
+            if (level.backgroundMusic) {
                 audioManager.setMusic(level.backgroundMusic);
-            }else{
+            } else {
                 audioManager.pauseMusic();
             }
 
             player.position = [...level.playerStartPos];
             textManager.clearAllTexts();
 
-        }else{
+        } else {
             console.log(`WARNING: level attempted to load at index ${index} does not exist!`);
         }
     },
 
-    start: function(){
+    start: function () {
         this.loadLevel(0);
     },
 
-    update: function(deltaTime){
+    update: function (deltaTime) {
         let posEvents = this.getCurrentLevel().positionEvents;
-        for(let i in posEvents){
+        for (let i in posEvents) {
             let e = posEvents[i];
             e.tryExecution([...player.position]);
         }
@@ -376,37 +376,37 @@ const audioManager = {
 
     currentSongName: null,
 
-    pauseMusic: function(){
-        if(this.music.hasOwnProperty(this.currentSongName)){
+    pauseMusic: function () {
+        if (this.music.hasOwnProperty(this.currentSongName)) {
 
             this.music[this.currentSongName].pause();
         }
     },
 
     playSoundEffect: function (effectName) {
-        if(this.soundEffects.hasOwnProperty(effectName)){
+        if (this.soundEffects.hasOwnProperty(effectName)) {
             let sound = this.soundEffects[effectName];
 
-            if(!sound.ended){
+            if (!sound.ended) {
                 let audioClone = new Audio(sound.src);
-                audioClone.addEventListener('canplay', ()=>{
+                audioClone.addEventListener('canplay', () => {
                     audioClone.play();
                 });
-                audioClone.addEventListener('ended', ()=>{
+                audioClone.addEventListener('ended', () => {
                     audioClone.remove();
                 })
             }
 
             sound.play();
-            
-        }else{
+
+        } else {
             console.log(`WARNING: sound effect '${effectName}' was requested to play but does not exist!`);
         }
     },
 
     setMusic: function (songName) {
-        
-        if (songName !== this.currentSongName){
+
+        if (songName !== this.currentSongName) {
             if (this.music.hasOwnProperty(songName)) {
 
                 if (this.currentSongName) {
@@ -434,18 +434,18 @@ const audioManager = {
      * 
      * @param {[{title: String, fileName: String}]} library 
      */
-    loadLibrary: function(library) {
-        for(let i in library){
+    loadLibrary: function (library) {
+        for (let i in library) {
             let songData = library[i];
 
-            if(songData.category === 'music'){
+            if (songData.category === 'music') {
                 let audio = new Audio(`sfx/${songData.fileName}`);
                 audio.loop = true;
                 this.music[songData.title] = audio;
-            }else if (songData.category === 'sfx'){
+            } else if (songData.category === 'sfx') {
                 this.soundEffects[songData.title] = new Audio(`sfx/${songData.fileName}`);
                 this.soundEffects[songData.title].volume = 0;
-                this.soundEffects[songData.title].addEventListener('ended', _=>{this.soundEffects[songData.title].volume = 1});
+                this.soundEffects[songData.title].addEventListener('ended', _ => { this.soundEffects[songData.title].volume = 1 });
                 this.soundEffects[songData.title].play();
             }
 
@@ -454,7 +454,7 @@ const audioManager = {
 }
 
 const textManager = {
-    
+
     currentTexts: [],
 
     /**
@@ -464,13 +464,13 @@ const textManager = {
      * 
      * @return {boolean} true: overlap, false: no overlap 
      */
-    checkTextOverlaps: function(onscreenTextObj){
+    checkTextOverlaps: function (onscreenTextObj) {
         let boundingBox = onscreenTextObj.getBoundingBox(tileSize, ctx);
-        
-        for(let i in this.currentTexts){
+
+        for (let i in this.currentTexts) {
             let t = this.currentTexts[i];
             let tBoundingBox = t.getBoundingBox(tileSize, ctx);
-            if(checkBoxOverlap(boundingBox, tBoundingBox)){
+            if (checkBoxOverlap(boundingBox, tBoundingBox)) {
                 return true;
             }
         }
@@ -478,35 +478,35 @@ const textManager = {
         return false;
     },
 
-    createText: function(message, position, size = 1, duration = 2000){
-        
+    createText: function (message, position, size = 1, duration = 2000) {
+
         let onscreenTextObj = new OnscreenText(message, position, size, duration);
 
-        if(!this.checkTextOverlaps(onscreenTextObj)){
+        if (!this.checkTextOverlaps(onscreenTextObj)) {
             this.currentTexts.push(onscreenTextObj);
-        }  
+        }
     },
 
-    forceCreateText: function(message, position, size = 1, duration = 2000){
+    forceCreateText: function (message, position, size = 1, duration = 2000) {
         this.currentTexts.push(new OnscreenText(message, position, size, duration));
     },
 
-    clearAllTexts: function(){
+    clearAllTexts: function () {
         this.currentTexts = [];
     },
 
-    update: function(deltaTime){
-        for(let i in this.currentTexts){
+    update: function (deltaTime) {
+        for (let i in this.currentTexts) {
             let t = this.currentTexts[i];
             t.update(deltaTime);
-            if (t.finished){
+            if (t.finished) {
                 this.currentTexts.splice(i, 1);
             }
         }
     }
 }
 
-function getCanvasPosition(worldPos){
+function getCanvasPosition(worldPos) {
     return [worldPos[0] * tileSize, worldPos[1] * tileSize];
 }
 
@@ -517,7 +517,7 @@ function getCanvasPosition(worldPos){
  * @param {[x, y, width, height]} box2 
  * @returns {boolean} true: overlap exists, false: overlap doesn't exist
  */
-function checkBoxOverlap(box1, box2){
+function checkBoxOverlap(box1, box2) {
 
     //the names of these variables reference direction from the entity's perspective
     let positiveXCollision = (box1[0] + box1[2] > box2[0]);
@@ -529,7 +529,7 @@ function checkBoxOverlap(box1, box2){
 
 }
 
-function start(){
+function start() {
 
     levelManager.start();
 
@@ -537,7 +537,7 @@ function start(){
 
 }
 
-function update(){
+function update() {
 
     let currentTime = Date.now();
     deltaTime = currentTime - lastTime;
@@ -549,7 +549,7 @@ function update(){
     particleManager.update(deltaTime);
     player.update(deltaTime);
     levelManager.update(deltaTime);
-    for(let i in entities){
+    for (let i in entities) {
         entities[i].update(deltaTime);
     }
 
@@ -572,26 +572,30 @@ const player = new Player();
 
 //categories include 'music' and 'sfx'
 const musicLibrary = [
-    { title: 'backgroundPiano', fileName: 'classical music background.wav', category: 'music' }, 
-    { title: 'harpsicordIntro', fileName: 'anita-harpsichord-intro.wav', category: 'sfx'},
+    { title: 'backgroundPiano', fileName: 'classical music background.wav', category: 'music' },
+    { title: 'harpsicordIntro', fileName: 'anita-harpsichord-intro.wav', category: 'sfx' },
     { title: 'jump0', fileName: 'jump0.wav', category: 'sfx' },
     { title: 'jump1', fileName: 'jump1.wav', category: 'sfx' },
-    { title: 'trapBackground', fileName: 'trap background.wav', category: 'music'},
-    { title: 'death0', fileName: 'death0.wav', category: 'sfx'},
+    { title: 'trapBackground', fileName: 'trap background.wav', category: 'music' },
+    { title: 'death0', fileName: 'death0.wav', category: 'sfx' },
     { title: 'death1', fileName: 'death1.wav', category: 'sfx' },
-    { title: 'door1', fileName: 'door1.wav', category: 'sfx'},
+    { title: 'door1', fileName: 'door1.wav', category: 'sfx' },
 ];
 audioManager.loadLibrary(musicLibrary);
 
-let sampleLevels = generateLevels(tilesVisibleVertically);
+// let sampleLevels = generateLevels(tilesVisibleVertically);
 
-levelManager.levels.push(sampleLevels[0]);
+// levelManager.levels.push(sampleLevels[0]);
 
-levelManager.levels.push(sampleLevels[1]);
+// levelManager.levels.push(sampleLevels[1]);
 
 // let sampleEnemy0 = new BasicEnemy([16, 24], 1, 1, true);
 
-start();
+loadLevelJSONList(['./levels/level0.json', './levels/level1.json'], levelManager.levels).then(_ => {
+    console.log(levelManager.levels);
+    levelManager.loadLevel(0);
+    start();
+});
 
 //code to be called after level loads.
 // setTimeout(_=>{entities.push(sampleEnemy0)}, 30);
