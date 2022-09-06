@@ -362,7 +362,7 @@ const levelLoader = {
 
     loadLevel: function (levelJSON) {
         let levelObj = JSON.parse(levelJSON);
-        console.log(levelObj);
+        // console.log(levelObj);
         this.levels.push(levelObj);
         if (!this.initiated) { this.setCurrentLevel(0) };
     },
@@ -376,6 +376,11 @@ const levelLoader = {
 
     exportLevel: function (title, fileName = "level") {
         let currentLevel = this.getCurrentLevel();
+
+        for(let i in currentLevel.positionEvents){
+            let posEvent = currentLevel.positionEvents[i];
+            console.log(posEvent);
+        }
 
         let levelJSON = JSON.stringify(currentLevel);
 
@@ -409,13 +414,13 @@ function updateMenu() {
 
 //level loading init VVVV
 
-// let sampleLevelsOBJ = generateLevels(40);
-// let sampleLevelsList = [];
-// for(let i in sampleLevelsOBJ){sampleLevelsList.push(sampleLevelsOBJ[i])}
+let sampleLevelsOBJ = generateLevels(40);
+let sampleLevelsList = [];
+for(let i in sampleLevelsOBJ){sampleLevelsList.push(sampleLevelsOBJ[i])}
 
-// levelLoader.levels = sampleLevelsList;
+levelLoader.levels = sampleLevelsList;
 
-// levelLoader.setCurrentLevel(0);
+levelLoader.setCurrentLevel(0);
 
 //context menu init VVVV
 

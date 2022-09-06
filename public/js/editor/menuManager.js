@@ -5,7 +5,6 @@ const menuManager = {
     levelElementsDiv: document.querySelector('#levelElements'),
     
     addElement: function(menuElement){
-        console.log(menuElement)
         this.levelElements[menuElement.label] = menuElement;
         this.levelElementsDiv.appendChild(menuElement.domElement);
     },
