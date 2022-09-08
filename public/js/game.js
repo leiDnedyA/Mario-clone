@@ -325,6 +325,7 @@ const levelManager = {
             entities = [];
             loadedPlatforms = [];
             loadedDoors = [];
+            
 
             for (let i in level.platforms) {
                 loadedPlatforms.push(level.platforms[i]);
@@ -592,7 +593,6 @@ audioManager.loadLibrary(musicLibrary);
 // let sampleEnemy0 = new BasicEnemy([16, 24], 1, 1, true);
 
 loadLevelJSONList(['./levels/level0.json', './levels/level1.json'], levelManager.levels).then(_ => {
-    console.log(levelManager.levels);
     levelManager.loadLevel(0);
     start();
 });

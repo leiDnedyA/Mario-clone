@@ -379,6 +379,7 @@ const levelLoader = {
 
         for(let i in currentLevel.positionEvents){
             let posEvent = currentLevel.positionEvents[i];
+            posEvent.type = 'onscreenText';
             console.log(posEvent);
         }
 

@@ -65,8 +65,6 @@ function parseRawLevel(rawLevel){
     let doors = [];
     let positionEvents = [];
 
-    console.log(rawLevel);
-
     for(let i in rawLevel.entities){
         //come back when entities are a thing and implement this.
     }
@@ -82,7 +80,11 @@ function parseRawLevel(rawLevel){
     }
 
     for(let i in rawLevel.positionEvents){
-        //come back when positionEvents are implemented into level storage
+        let posEvent = rawLevel.positionEvents[i];
+        console.log(posEvent);
+        if(posEvent.type === 'onscreenText'){
+            positionEvents.push(new OnscreenTextEvent(posEvent.text, posEvent.position, posEvent.range, posEvent.isRepeatable, posEvent.repeatDelay));
+        }
     }
 
     return new Level(entities, platforms, rawLevel.playerStartPos, rawLevel.boundingBox, rawLevel.backgroundMusic, positionEvents, doors)

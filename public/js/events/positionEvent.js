@@ -57,5 +57,6 @@ class PositionEvent {
 class OnscreenTextEvent extends PositionEvent {
     constructor(text = 'sample text', position = [0, 0], range = [5, 5], isRepeatable = true, repeatDelay = 5000) {
         super(position, playerPosition => { textManager.createText(text, [...playerPosition]) }, range, isRepeatable, repeatDelay);
+        this.text = text;
     }
 }
