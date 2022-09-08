@@ -415,13 +415,13 @@ function updateMenu() {
 
 //level loading init VVVV
 
-let sampleLevelsOBJ = generateLevels(40);
-let sampleLevelsList = [];
-for(let i in sampleLevelsOBJ){sampleLevelsList.push(sampleLevelsOBJ[i])}
+// let sampleLevelsOBJ = generateLevels(40);
+// let sampleLevelsList = [];
+// for(let i in sampleLevelsOBJ){sampleLevelsList.push(sampleLevelsOBJ[i])}
 
-levelLoader.levels = sampleLevelsList;
+// levelLoader.levels = sampleLevelsList;
 
-levelLoader.setCurrentLevel(0);
+// levelLoader.setCurrentLevel(0);
 
 //context menu init VVVV
 
