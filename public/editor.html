@@ -88,6 +88,11 @@
             background-color: #aadddd;
         }
 
+        .coolDropdown {
+            margin: 3px 0 3px 0;
+            padding: 2px;
+        }
+
     </style>
 </head>
 
@@ -104,6 +109,11 @@
                 <button id="levelLoadButton" class="coolButton">Load level JSON</button>
                 <button id="levelDownloadButton" class="coolButton">Download level JSON</button>
             </div>
+            
+            <select id="loadedLevelDropdown" class="coolDropdown">
+                <option value="" disabled selected>Select your option</option>
+            </select>
+
             <div id="levelElements">
 
             </div>
@@ -113,6 +123,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"></script>
     <script src="./js/colorImageObjects.js"></script>
     <script src="./js/editor/contextMenu.js"></script>
+    <script src="./js/editor/levelDropdown.js"></script>
     <script src="./js/editor/menuManager.js"></script>
     <script src="./js/editor/BoundsObject.js"></script>
     <script src="./js/worldElements/platform.js"></script>
