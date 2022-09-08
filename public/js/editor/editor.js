@@ -177,6 +177,8 @@ window.addEventListener('contextmenu', (e) => {
 
 window.addEventListener('wheel', (e) => {
 
+
+
     let mouseWorldPos0 = screenPosToWorldPos([e.clientX, e.clientY]);
 
     let deltaY = Math.sign(e.deltaY) * getZoomVelocity();
@@ -380,7 +382,6 @@ const levelLoader = {
         for(let i in currentLevel.positionEvents){
             let posEvent = currentLevel.positionEvents[i];
             posEvent.type = 'onscreenText';
-            console.log(posEvent);
         }
 
         let levelJSON = JSON.stringify(currentLevel);
