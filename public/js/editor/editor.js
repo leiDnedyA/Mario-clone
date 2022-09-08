@@ -177,7 +177,9 @@ window.addEventListener('contextmenu', (e) => {
 
 window.addEventListener('wheel', (e) => {
 
-
+    if(e.target !== canvas){
+        return
+    }
 
     let mouseWorldPos0 = screenPosToWorldPos([e.clientX, e.clientY]);
 
