@@ -455,8 +455,7 @@ ctxButtonList.push(new ContextButton("Add platform", ctxBtnConditionals.freeSpac
 
 
 ctxButtonList.push(new ContextButton("Changed Destination (Doors)", ctxBtnConditionals.door, targetData => {
-    let popupWindow = window.open('/destination_popup.html', 'doorLocationSelector', 'popup,width=500,height=500');
-    popupWindow.alert('hello world')
+    destinationPopupController.open();
     //add functionality to interact w/ popup here
 }))
 
