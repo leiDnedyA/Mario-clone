@@ -441,12 +441,6 @@ ctxButtonList.push(new ContextButton("Test", ctxBtnConditionals.anyObject, targe
     console.log(targetData)
 }));
 
-ctxButtonList.push(new ContextButton("Changed Exit Location (Doors)", ctxBtnConditionals.door, targetData => {
-    let popupWindow = window.open('/editor_popup.html', 'doorLocationSelector', 'popup,width=500,height=500');
-    popupWindow.alert('hello world')
-    //add functionality to interact w/ popup here
-}))
-
 ctxButtonList.push(new ContextButton("Delete", ctxBtnConditionals.anyObject, targetData => {
     //REMINDER: this will only delete objects from the current view
     deleteGameObject(targetData.type, targetData.index);
@@ -458,6 +452,13 @@ ctxButtonList.push(new ContextButton("Add platform", ctxBtnConditionals.freeSpac
     loadedPlatforms.push(new Platform(selectedObjectData.getClickPosition(), [1, 1]));
     levelLoader.updateLevel();
 }));
+
+
+ctxButtonList.push(new ContextButton("Changed Destination (Doors)", ctxBtnConditionals.door, targetData => {
+    let popupWindow = window.open('/editor_popup.html', 'doorLocationSelector', 'popup,width=500,height=500');
+    popupWindow.alert('hello world')
+    //add functionality to interact w/ popup here
+}))
 
 contextMenu.init(ctxButtonList);
 
