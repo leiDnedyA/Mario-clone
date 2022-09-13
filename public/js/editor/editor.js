@@ -433,12 +433,19 @@ const ctxButtonList = [];
 const ctxBtnConditionals = { //stores repeat conditional functions
     freeSpace: targetData => (targetData.type === ''),
     anyObject: targetData => (targetData.type !== ''),
+    door: targetData => (targetData.type === 'door'),
     alwaysTrue: _ => true,
 };
 
 ctxButtonList.push(new ContextButton("Test", ctxBtnConditionals.anyObject, targetData => {
     console.log(targetData)
 }));
+
+ctxButtonList.push(new ContextButton("Changed Exit Location (Doors)", ctxBtnConditionals.door, targetData => {
+    let popupWindow = window.open('/editor_popup.html', 'doorLocationSelector', 'popup,width=500,height=500');
+    popupWindow.alert('hello world')
+    //add functionality to interact w/ popup here
+}))
 
 ctxButtonList.push(new ContextButton("Delete", ctxBtnConditionals.anyObject, targetData => {
     //REMINDER: this will only delete objects from the current view

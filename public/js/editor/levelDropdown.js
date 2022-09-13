@@ -42,7 +42,7 @@ const levelDropdown = {
             this.currentIndex = this.domElement.selectedIndex;
             this.onclickCallback();
         });
-
+        
     },
 
 }
