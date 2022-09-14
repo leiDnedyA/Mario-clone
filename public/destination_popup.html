@@ -10,6 +10,14 @@
         </style>
     </head>
     <body>
-        <canvas id="editorCanvas"></canvas>
+        <canvas id="popupCanvas"></canvas>
+        <script>
+            const bc = new BroadcastChannel('destinationPopup');
+
+            bc.addEventListener('message', e=>{
+                console.log(e.data)
+            })
+
+        </script>
     </body>
 </html>
