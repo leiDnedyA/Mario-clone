@@ -1,22 +1,29 @@
 
 const destinationPopupController = {
 
-    windowObj : null,
+    windowObj: null,
+
+    broadcastChannel: new BroadcastChannel('destinationPopup'),
 
     close: function () {
-        if(!this.windowObj.closed){
+        if (!this.windowObj.closed) {
             this.windowObj.close();
         }
     },
     open: function () {
 
-        if(this.windowObj === null || this.windowObj.closed){
-            this.windowObj = window.open('/destination_popup.html', 'doorLocationSelector', 'popup,width=500,height=500');
-        }else{
-            this.windowObj.focus();
+        let loadContents = () => {
+            this.broadcastChannel.postMessage(420);            
         }
 
-        
+        if (this.windowObj === null || this.windowObj.closed) {
+            this.windowObj = window.open('destination_popup.html', 'doorLocationSelector', 'popup,width=500,height=500');
+            
+            
+        } else {
+            this.windowObj.focus();
+            loadContents();
+        }
 
 
     },
