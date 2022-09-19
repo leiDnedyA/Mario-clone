@@ -13,7 +13,15 @@ const destinationPopupController = {
     open: function () {
 
         let loadContents = () => {
-            this.broadcastChannel.postMessage(420);            
+
+            let popupData = {
+                level: null
+            }
+
+            this.broadcastChannel.postMessage();
+            this.broadcastChannel.onmessage = (data)=>{
+                console.log(data.position);
+            }
         }
 
         if (this.windowObj === null || this.windowObj.closed) {
