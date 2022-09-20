@@ -12,7 +12,7 @@ const levelDropdown = {
 
     setCurrentIndex: function(index){
         this.currentIndex = parseInt(index);
-        domElement.selectedIndex = this.currentIndex;
+        this.domElement.selectedIndex = this.currentIndex;
     },
 
     /**
@@ -35,12 +35,17 @@ const levelDropdown = {
 
     onclickCallback: null,
     
+    /**
+     * Initializes Dropdown.
+     * 
+     * @param {function} onclickCallback callback function for when option is selected
+     */
     init: function(onclickCallback){
         this.onclickCallback = onclickCallback;
 
         this.domElement.addEventListener('click', ()=>{
             this.currentIndex = this.domElement.selectedIndex;
-            this.onclickCallback();
+            this.onclickCallback(this.currentIndex);
         });
         
     },

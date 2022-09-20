@@ -177,7 +177,7 @@ window.addEventListener('contextmenu', (e) => {
 
 window.addEventListener('wheel', (e) => {
 
-    if(e.target !== canvas){
+    if (e.target !== canvas) {
         return
     }
 
@@ -296,16 +296,16 @@ const levelLoader = {
 
             //menuManager setup
 
-            let playerStartPosElement = new MenuElement('Player Start Pos', loadedBoundsObjs.startPos, 'boundsObj', _=>{
+            let playerStartPosElement = new MenuElement('Player Start Pos', loadedBoundsObjs.startPos, 'boundsObj', _ => {
                 selectedObjectData.loadObject('boundsObj', 'startPos', null);
             })
             menuManager.addElement(playerStartPosElement);
 
-            let levelBoundsElement = new MenuElement('Level Bounds', loadedBoundsObjs.startPos, 'boundsObj', _=>{
+            let levelBoundsElement = new MenuElement('Level Bounds', loadedBoundsObjs.startPos, 'boundsObj', _ => {
                 selectedObjectData.loadObject('boundsObj', 'levelBounds', null);
             })
             menuManager.addElement(levelBoundsElement);
-
+            levelDropdown.setCurrentIndex(index);
 
         }
     },
@@ -315,6 +315,9 @@ const levelLoader = {
         // console.log(levelObj);
         this.levels.push(levelObj);
         if (!this.initiated) { this.setCurrentLevel(0) };
+        levelDropdown.setOptionsList(Array.from(Array(this.levels.length).keys()).map(v => `Level ${v}`));
+        this.setCurrentLevel(this.levels.length - 1);
+
     },
 
     updateLevel: function () {
@@ -327,7 +330,7 @@ const levelLoader = {
     exportLevel: function (title, fileName = "level") {
         let currentLevel = this.getCurrentLevel();
 
-        for(let i in currentLevel.positionEvents){
+        for (let i in currentLevel.positionEvents) {
             let posEvent = currentLevel.positionEvents[i];
             posEvent.type = 'onscreenText';
         }
@@ -406,5 +409,11 @@ ctxButtonList.push(new ContextButton("Changed Destination (Doors)", ctxBtnCondit
 }))
 
 contextMenu.init(ctxButtonList);
+
+levelDropdown.init(index => {
+
+    levelLoader.setCurrentLevel(index);
+
+});
 
 start();
