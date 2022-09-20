@@ -356,6 +356,11 @@ const levelLoader = {
         }
     },
 
+    createLevel: function() {
+        let lvl = new Level([], [], [0, 0], [[-10, -10], [100, 200]]);
+        this.loadLevel(JSON.stringify(lvl))
+    },
+
     loadLevel: function (levelJSON) {
         let levelObj = JSON.parse(levelJSON);
         // console.log(levelObj);
