@@ -277,12 +277,14 @@ const doorPosController = {
     posTextElement: document.querySelector('#positionText'),
 
     start: function(startLevelIndex, doorIndex){
+        canvas.style.cursor = 'crosshair';
         this.isActive = true;
         this.levelIndex = startLevelIndex;
         this.doorIndex = doorIndex;
         this.posTextElement.style.visibility = 'visible';
     },
     cancel: function(){
+        canvas.style.cursor = 'auto';
         this.isActive = false;
         this.levelIndex = 0;
         this.doorIndex = 0;
@@ -295,13 +297,19 @@ const doorPosController = {
             if(e.key === 'Escape' && this.isActive){
                 this.cancel();
             }
-        })
+        });
         canvas.addEventListener('mouseup', e=>{
             if(this.isActive){
                 //setting selected door exit pos and exit level to click position in current level
                 levelLoader.levels[this.levelIndex].doors[this.doorIndex].exitPosition = screenPosToWorldPos([e.clientX, e.clientY]);
                 levelLoader.levels[this.levelIndex].doors[this.doorIndex].destinationLevelIndex = 0 + parseInt(levelLoader.currentLevelIndex);
                 this.cancel();
+            }
+        });
+        canvas.addEventListener('mousemove', e=>{
+            if(this.isActive){
+                let cursorPos = screenPosToWorldPos([e.clientX, e.clientY]);
+                this.posTextElement.innerHTML = `Door exit pos: (${cursorPos[0].toFixed(2)}, ${cursorPos[1].toFixed(2)}), level index: ${levelLoader.currentLevelIndex}`
             }
         })
 
@@ -434,6 +442,12 @@ ctxButtonList.push(new ContextButton("Delete", ctxBtnConditionals.anyObject, tar
     levelLoader.updateLevel();
     selectedObjectData.reset();
 }))
+
+ctxButtonList.push(new ContextButton("Add door", ctxBtnConditionals.freeSpace, targetData => {
+    loadedDoors.push(new Door(selectedObjectData.getClickPosition(), [1, 2], 0 + parseInt(levelLoader.currentLevelIndex), [0, 0]));
+    levelLoader.updateLevel();
+}));
+
 
 ctxButtonList.push(new ContextButton("Add platform", ctxBtnConditionals.freeSpace, targetData => {
     loadedPlatforms.push(new Platform(selectedObjectData.getClickPosition(), [1, 1]));
