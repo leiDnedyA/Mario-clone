@@ -404,7 +404,7 @@ ctxButtonList.push(new ContextButton("Add platform", ctxBtnConditionals.freeSpac
 
 
 ctxButtonList.push(new ContextButton("Changed Destination (Doors)", ctxBtnConditionals.door, targetData => {
-    destinationPopupController.open();
+    // destinationPopupController.open();
     //add functionality to interact w/ popup here
 }))
 
