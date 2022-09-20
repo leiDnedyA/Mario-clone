@@ -268,7 +268,36 @@ function resizeOrZoom() {
     canvas.height = window.innerHeight;
 }
 
+const doorPosController = {
+    isActive : false,
 
+    levelIndex: 0, //index of level containing selected door
+    doorIndex: 0, //index of selected door in the doors list if its respective level object
+
+    posTextElement: document.querySelector('#positionText'),
+
+    start: function(startLevelIndex, doorIndex){
+        this.isActive = true;
+        this.levelIndex = startLevelIndex;
+        this.doorIndex = doorIndex;
+        this.posTextElement.style.visibility = 'visible';
+    },
+    cancel: function(){
+        this.isActive = false;
+        this.levelIndex = 0;
+        this.doorIndex = 0;
+        this.posTextElement.style.visibility = 'hidden';
+    },
+    init: function(){
+        
+        this.posTextElement.style.visibility = 'hidden';
+        window.addEventListener('keydown', e=>{
+            if(e.key === 'Escape' && this.isActive){
+                this.cancel();
+            }
+        })
+    }
+}
 
 const levelLoader = {
 
@@ -402,14 +431,13 @@ ctxButtonList.push(new ContextButton("Add platform", ctxBtnConditionals.freeSpac
     levelLoader.updateLevel();
 }));
 
-
 ctxButtonList.push(new ContextButton("Changed Destination (Doors)", ctxBtnConditionals.door, targetData => {
-    
-    
-
+    console.log(targetData)
+    doorPosController.start(0+parseInt(levelLoader.currentLevelIndex), targetData.index);
 }))
 
 contextMenu.init(ctxButtonList);
+doorPosController.init();
 
 levelDropdown.init(index => {
 
