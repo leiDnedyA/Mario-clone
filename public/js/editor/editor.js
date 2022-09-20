@@ -296,6 +296,15 @@ const doorPosController = {
                 this.cancel();
             }
         })
+        canvas.addEventListener('mouseup', e=>{
+            if(this.isActive){
+                //setting selected door exit pos and exit level to click position in current level
+                levelLoader.levels[this.levelIndex].doors[this.doorIndex].exitPosition = screenPosToWorldPos([e.clientX, e.clientY]);
+                levelLoader.levels[this.levelIndex].doors[this.doorIndex].destinationLevelIndex = 0 + parseInt(levelLoader.currentLevelIndex);
+                this.cancel();
+            }
+        })
+
     }
 }
 
